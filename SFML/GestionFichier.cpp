@@ -20,7 +20,17 @@ void creerDossier(const std::string& dossier) {
 
 void GestionFichier::sauvegarderConfiguration(const Grille& grille, const std::string& chemin) {
     try {
-        grille.sauvegarderDansFichier(chemin); // Appelle directement la méthode de Grille
+        std::ofstream fichier(chemin);  // Ouvre le fichier en mode écriture
+        if (!fichier) {
+            throw std::ios_base::failure("Impossible d'ouvrir le fichier pour la sauvegarde");
+        }
+
+        // Sauvegarder les dimensions de la grille à la première ligne
+        fichier << grille.getNbLignes() << " " << grille.getNbColonnes() << "\n";
+
+        // Sauvegarder le contenu de la grille dans le fichier
+        grille.sauvegarderDansFichier(chemin);
+
         std::cout << "Configuration sauvegardée dans : " << chemin << "\n";
     }
     catch (const std::exception& e) {
