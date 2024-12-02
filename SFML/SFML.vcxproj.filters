@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers sources\Composant">
+      <UniqueIdentifier>{ac831740-a3a2-4d02-af29-f1e5743e44c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Composant">
+      <UniqueIdentifier>{14af148c-0f2b-4cf5-bd39-77ea0d121f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Service">
+      <UniqueIdentifier>{c4c0fa91-cb77-4997-b709-4c53b36f4d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\IHM">
+      <UniqueIdentifier>{1c461ef0-ce85-4be3-abfa-33dc7a724ead}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\IHM">
+      <UniqueIdentifier>{5252428b-8b51-42df-b292-73b113361c7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Service">
+      <UniqueIdentifier>{aaa9a116-521b-4287-b561-bcbdba6feb78}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Grille.cpp">
+      <Filter>Fichiers sources\Composant</Filter>
+    </ClCompile>
+    <ClCompile Include="Cellule.cpp">
+      <Filter>Fichiers sources\Composant</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeJeu.cpp">
+      <Filter>Fichiers sources\IHM</Filter>
+    </ClCompile>
+    <ClCompile Include="SFMLInterface.cpp">
+      <Filter>Fichiers sources\IHM</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeGraphique.cpp">
+      <Filter>Fichiers sources\IHM</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeConsole.cpp">
+      <Filter>Fichiers sources\IHM</Filter>
+    </ClCompile>
+    <ClCompile Include="GestionFichier.cpp">
+      <Filter>Fichiers sources\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="JeuDeLaVie.cpp">
+      <Filter>Fichiers sources\Service</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="config.txt">
+      <Filter>Fichiers sources</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Grille.h">
+      <Filter>Fichiers d%27en-tête\Composant</Filter>
+    </ClInclude>
+    <ClInclude Include="Cellule.h">
+      <Filter>Fichiers d%27en-tête\Composant</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeJeu.h">
+      <Filter>Fichiers d%27en-tête\IHM</Filter>
+    </ClInclude>
+    <ClInclude Include="SFMLInterface.h">
+      <Filter>Fichiers d%27en-tête\IHM</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeGraphique.h">
+      <Filter>Fichiers d%27en-tête\IHM</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeConsole.h">
+      <Filter>Fichiers d%27en-tête\IHM</Filter>
+    </ClInclude>
+    <ClInclude Include="GestionFichier.h">
+      <Filter>Fichiers d%27en-tête\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="JeuDeLaVie.h">
+      <Filter>Fichiers d%27en-tête\Service</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
