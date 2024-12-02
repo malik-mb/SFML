@@ -9,9 +9,14 @@ int main() {
     int nbLignes = 20, nbColonnes = 20;
     Grille grille(nbLignes, nbColonnes);
 
-    // Charger la configuration depuis un fichier
+    // Demander le chemin du fichier
+    std::string cheminFichier;
+    std::cout << "Veuillez entrer le chemin du fichier de configuration : ";
+    std::cin >> cheminFichier;
+
+    // Charger la configuration depuis le fichier
     try {
-        GestionFichier::chargerConfiguration(grille, "config.txt");
+        GestionFichier::chargerConfiguration(grille, cheminFichier);
     }
     catch (const std::exception& e) {
         std::cerr << "Erreur de chargement du fichier : " << e.what() << "\n";
@@ -35,9 +40,9 @@ int main() {
         std::cerr << "Mode invalide.\n";
     }
 
-    // Sauvegarder la configuration dans un fichier
+    // Sauvegarder la configuration dans le fichier
     try {
-        GestionFichier::sauvegarderConfiguration(grille, "config.txt");
+        GestionFichier::sauvegarderConfiguration(grille, cheminFichier);
     }
     catch (const std::exception& e) {
         std::cerr << "Erreur de sauvegarde du fichier : " << e.what() << "\n";
