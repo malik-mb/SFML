@@ -84,7 +84,7 @@ void Grille::calculerProchaineIteration() {
 void Grille::afficherEtat() const {
     for (const auto& ligne : cellules) {
         for (const auto& cellule : ligne) {
-            std::cout << (cellule.estVivante() ? "O" : ".");
+            std::cout << (cellule.estVivante() ? "1" : "0");
         }
         std::cout << "\n";
     }
