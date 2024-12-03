@@ -1,7 +1,9 @@
 #include "SFMLInterface.h"
 
-SFMLInterface::SFMLInterface(int largeur, int hauteur) {
+SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
+    : tailleCellule(tailleCellule) {
     window.create(sf::VideoMode(largeur, hauteur), "Simulation Graphique");
+    celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1)); // Légèrement plus petit pour un effet de grille
 }
 
 bool SFMLInterface::estOuverte() const {
@@ -9,8 +11,21 @@ bool SFMLInterface::estOuverte() const {
 }
 
 void SFMLInterface::afficherGrille(const Grille& grille) {
-    window.clear(sf::Color::Green);
-    // Logique d'affichage des cellules de la grille (vivante/morte).
+    window.clear(sf::Color(50, 50, 50)); // Fond gris foncé
+
+    for (int i = 0; i < grille.getNbLignes(); ++i) {
+        for (int j = 0; j < grille.getNbColonnes(); ++j) {
+            if (grille.getCellule(i, j).estVivante()) {
+                celluleShape.setFillColor(sf::Color(255, 105, 180)); // Rose vif
+            }
+            else {
+                celluleShape.setFillColor(sf::Color(200, 200, 200)); // Gris clair
+            }
+            celluleShape.setPosition(j * tailleCellule, i * tailleCellule);
+            window.draw(celluleShape);
+        }
+    }
+
     window.display();
 }
 

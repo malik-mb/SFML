@@ -7,9 +7,11 @@
 class SFMLInterface {
 private:
     sf::RenderWindow window;
+    sf::RectangleShape celluleShape;
+    int tailleCellule;
 
 public:
-    SFMLInterface(int largeur, int hauteur); // Constructeur
+    SFMLInterface(int largeur, int hauteur, int tailleCellule); // Constructeur
     bool estOuverte() const;
     void afficherGrille(const Grille& grille);
     void attendreEvenements();

@@ -11,7 +11,7 @@ int main() {
     Grille grille(nbLignes, nbColonnes);
 
     // Demander le chemin du fichier
-    std::string cheminFichier; 
+    std::string cheminFichier;
     std::cout << "Veuillez entrer le chemin du fichier de configuration : ";
     std::cin >> cheminFichier;
 
@@ -35,9 +35,9 @@ int main() {
             ModeConsole modeConsole(grille);
             modeConsole.lancerSimulation();
         }
-        else if (modeChoisi == 2) {
-            // Création de l'interface graphique SFML
-            auto sfml = std::make_unique<SFMLInterface>(nbColonnes * 10, nbLignes * 10);
+        else if(modeChoisi == 2) {
+            int tailleCellule = 20; // Taille d'une cellule en pixels
+            auto sfml = std::make_unique<SFMLInterface>(nbColonnes * tailleCellule, nbLignes * tailleCellule, tailleCellule);
             ModeGraphique modeGraphique(grille, std::move(sfml));
             modeGraphique.lancerSimulation();
         }
