@@ -8,7 +8,6 @@ ModeGraphique::ModeGraphique(const Grille& grille, std::unique_ptr<SFMLInterface
 
 // Implémentation de lancerSimulation
 void ModeGraphique::lancerSimulation() {
-    // Vitesse initiale de la simulation en millisecondes (1 seconde)
     int vitesseSimulation = 1000;  // 1000ms = 1 seconde
     sf::Clock clock;  // Horloge pour mesurer le temps écoulé
 
@@ -28,19 +27,7 @@ void ModeGraphique::lancerSimulation() {
             // Réinitialiser l'horloge pour la prochaine itération
             clock.restart();
         }
-
-        // Gérer les entrées clavier pour ajuster la vitesse de la simulation
-        interface->attendreEvenements(vitesseSimulation);  // Attendre les événements de la fenêtre
-
-        // Flèche droite (?) : augmenter la vitesse de la simulation de 200 ms
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            vitesseSimulation = std::max(vitesseSimulation - 200, 100);  // Min. 100ms
-        }
-
-        // Flèche gauche (?) : diminuer la vitesse de la simulation de 200 ms
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            vitesseSimulation = std::min(vitesseSimulation + 200, 2000);  // Max. 2000ms
-        }
     }
 }
+
 
