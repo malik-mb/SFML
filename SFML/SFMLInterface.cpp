@@ -29,10 +29,25 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
     window.display();
 }
 
-void SFMLInterface::attendreEvenements() {
+void SFMLInterface::attendreEvenements(int& vitesseSimulation) {
     sf::Event event;
     while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed)
+        if (event.type == sf::Event::Closed) {
             window.close();
+        }
+
+        // Gérer les événements de touches pour ajuster la vitesse
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Right) {
+                // Réduire la vitesse de simulation
+                vitesseSimulation = std::max(vitesseSimulation - 200, 100);
+            }
+            if (event.key.code == sf::Keyboard::Left) {
+                // Augmenter la vitesse de simulation
+                vitesseSimulation = std::min(vitesseSimulation + 200, 2000);
+            }
+        }
     }
 }
+
+

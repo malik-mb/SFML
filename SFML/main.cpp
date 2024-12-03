@@ -7,7 +7,7 @@
 #include "GestionFichier.h"
 
 int main() {
-    int nbLignes = 20, nbColonnes = 30;
+    int nbLignes = 20, nbColonnes = 20;
     Grille grille(nbLignes, nbColonnes);
 
     // Demander le chemin du fichier
@@ -35,10 +35,10 @@ int main() {
             ModeConsole modeConsole(grille);
             modeConsole.lancerSimulation();
         }
-        else if(modeChoisi == 2) {
+        else if (modeChoisi == 2) {
             int tailleCellule = 20; // Taille d'une cellule en pixels
             auto sfml = std::make_unique<SFMLInterface>(nbColonnes * tailleCellule, nbLignes * tailleCellule, tailleCellule);
-            ModeGraphique modeGraphique(grille, std::move(sfml));
+            ModeGraphique modeGraphique(grille, std::move(sfml)); // La grille est passée ici après avoir été chargée
             modeGraphique.lancerSimulation();
         }
         else {

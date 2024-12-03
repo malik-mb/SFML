@@ -29,10 +29,30 @@ void Grille::initialiserDepuisFichier(const std::string& chemin) {
         throw std::runtime_error("Impossible d'ouvrir le fichier : " + chemin);
     }
 
+    int lignes, colonnes;
+    fichier >> lignes >> colonnes;
+
+    if (fichier.fail() || lignes <= 0 || colonnes <= 0) {
+        throw std::runtime_error("Dimensions invalides dans le fichier.");
+    }
+
+    if (lignes != nbLignes || colonnes != nbColonnes) {
+        throw std::runtime_error("Dimensions du fichier (" +
+            std::to_string(lignes) + "x" + std::to_string(colonnes) +
+            ") ne correspondent pas à la grille attendue (" +
+            std::to_string(nbLignes) + "x" + std::to_string(nbColonnes) + ").");
+    }
+
     for (int i = 0; i < nbLignes; ++i) {
         for (int j = 0; j < nbColonnes; ++j) {
             int etat;
             fichier >> etat;
+
+            if (fichier.fail() || (etat != 0 && etat != 1)) {
+                throw std::runtime_error("Valeur invalide dans la grille à la position (" +
+                    std::to_string(i) + ", " + std::to_string(j) + ").");
+            }
+
             cellules[i][j] = Cellule(etat == 1);
         }
     }
@@ -44,13 +64,16 @@ void Grille::sauvegarderDansFichier(const std::string& chemin) const {
         throw std::runtime_error("Impossible d'ouvrir le fichier pour sauvegarder : " + chemin);
     }
 
+    fichier << nbLignes << " " << nbColonnes << "\n"; // Écrit la taille de la grille en première ligne
+
     for (int i = 0; i < nbLignes; ++i) {
         for (int j = 0; j < nbColonnes; ++j) {
             fichier << (getCellule(i, j).estVivante() ? 1 : 0) << " ";
         }
-        fichier << "\n";
+        fichier << "\n"; // Ajoute un retour à la ligne après chaque rangée
     }
 }
+
 
 void Grille::calculerProchaineIteration() {
     for (int i = 0; i < nbLignes; ++i) {

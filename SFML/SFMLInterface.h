@@ -14,7 +14,9 @@ public:
     SFMLInterface(int largeur, int hauteur, int tailleCellule); // Constructeur
     bool estOuverte() const;
     void afficherGrille(const Grille& grille);
-    void attendreEvenements();
+    // Déclaration modifiée de la fonction pour accepter un argument `int&`
+    void attendreEvenements(int& vitesseSimulation);  // Ajouter l'argument ici
+
 };
 
 #endif // SFMLINTERFACE_H
