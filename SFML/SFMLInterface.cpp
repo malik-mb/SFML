@@ -9,7 +9,7 @@ bool SFMLInterface::estOuverte() const {
 }
 
 void SFMLInterface::afficherGrille(const Grille& grille) {
-    window.clear(sf::Color::Black);
+    window.clear(sf::Color::Green);
     // Logique d'affichage des cellules de la grille (vivante/morte).
     window.display();
 }

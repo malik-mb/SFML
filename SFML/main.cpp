@@ -11,7 +11,7 @@ int main() {
     Grille grille(nbLignes, nbColonnes);
 
     // Demander le chemin du fichier
-    std::string cheminFichier;
+    std::string cheminFichier; 
     std::cout << "Veuillez entrer le chemin du fichier de configuration : ";
     std::cin >> cheminFichier;
 
