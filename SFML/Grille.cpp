@@ -59,8 +59,12 @@ void Grille::calculerProchaineIteration() {
             for (int di = -1; di <= 1; ++di) {
                 for (int dj = -1; dj <= 1; ++dj) {
                     if (di == 0 && dj == 0) continue;
-                    int ni = i + di, nj = j + dj;
-                    if (ni >= 0 && ni < nbLignes && nj >= 0 && nj < nbColonnes && cellules[ni][nj].estVivante()) {
+
+                    // Indices voisins avec gestion torique
+                    int ni = (i + di + nbLignes) % nbLignes;
+                    int nj = (j + dj + nbColonnes) % nbColonnes;
+
+                    if (cellules[ni][nj].estVivante()) {
                         ++vivantes;
                     }
                 }

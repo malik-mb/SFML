@@ -16,10 +16,10 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
     for (int i = 0; i < grille.getNbLignes(); ++i) {
         for (int j = 0; j < grille.getNbColonnes(); ++j) {
             if (grille.getCellule(i, j).estVivante()) {
-                celluleShape.setFillColor(sf::Color(255, 105, 180)); // Rose vif
+                celluleShape.setFillColor(sf::Color(0, 255, 255)); // Rose vif
             }
             else {
-                celluleShape.setFillColor(sf::Color(200, 200, 200)); // Gris clair
+                celluleShape.setFillColor(sf::Color(0, 0, 0)); // Gris clair
             }
             celluleShape.setPosition(j * tailleCellule, i * tailleCellule);
             window.draw(celluleShape);
