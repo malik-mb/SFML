@@ -10,7 +10,7 @@ private:
     int nbLignes;
     int nbColonnes;
     std::vector<std::vector<Cellule>> cellules;
-
+    std::vector<std::vector<bool>> etatPrecedent; // Ajout pour stocker l'état précédent
 public:
     Grille(int lignes, int colonnes);
 
@@ -24,6 +24,7 @@ public:
     void sauvegarderDansFichier(const std::string& chemin) const;
     void calculerProchaineIteration();
     void afficherEtat() const;
+    bool estStable() const; // Nouvelle méthode
 };
 
 #endif // GRILLE_H
