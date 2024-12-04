@@ -19,12 +19,11 @@ public:
 
     Cellule& getCellule(int x, int y);
     const Cellule& getCellule(int x, int y) const;
-
+    bool estStable() const; // Nouvelle méthode
     void initialiserDepuisFichier(const std::string& chemin);
     void sauvegarderDansFichier(const std::string& chemin) const;
     void calculerProchaineIteration();
     void afficherEtat() const;
-    bool estStable() const; // Nouvelle méthode
 };
 
 #endif // GRILLE_H

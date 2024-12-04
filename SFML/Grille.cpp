@@ -57,7 +57,17 @@ void Grille::initialiserDepuisFichier(const std::string& chemin) {
         }
     }
 }
-
+bool Grille::estStable() const {
+    for (int i = 0; i < nbLignes; ++i) {
+        for (int j = 0; j < nbColonnes; ++j) {
+            // Comparer l'état actuel avec l'état précédent
+            if (cellules[i][j].estVivante() != etatPrecedent[i][j]) {
+                return false; // Si un état diffère, ce n'est pas stable
+            }
+        }
+    }
+    return true; // Tous les états sont identiques
+}
 void Grille::sauvegarderDansFichier(const std::string& chemin) const {
     std::ofstream fichier(chemin);
     if (!fichier) {
@@ -107,17 +117,7 @@ void Grille::calculerProchaineIteration() {
         }
     }
 }
-bool Grille::estStable() const {
-    for (int i = 0; i < nbLignes; ++i) {
-        for (int j = 0; j < nbColonnes; ++j) {
-            // Comparer l'état actuel avec l'état précédent
-            if (cellules[i][j].estVivante() != etatPrecedent[i][j]) {
-                return false; // Si un état diffère, ce n'est pas stable
-            }
-        }
-    }
-    return true; // Tous les états sont identiques
-}
+
 void Grille::afficherEtat() const {
     for (const auto& ligne : cellules) {
         for (const auto& cellule : ligne) {
