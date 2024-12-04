@@ -9,7 +9,9 @@ Un projet de simulation du célèbre **Jeu de la Vie** de John Conway, implémen
 Le **Jeu de la Vie** est un automate cellulaire conçu par le mathématicien **John Conway**. Il simule l'évolution d'une population de cellules vivantes dans une grille selon des règles simples :  
 
 - 🟢 Une cellule **vivante** reste vivante si elle a **2 ou 3 voisins vivants**, sinon elle meurt.  
-- ⚫ Une cellule **morte** devient vivante si elle a exactement **3 voisins vivants**.  
+- ⚫ Une cellule **morte** devient vivante si elle a exactement **3 voisins vivants**.
+- . ☠️ Sinon, la cellule meurt ou reste morte.
+
 
 Ce projet propose :  
 - 🌌 **Mode Console** : Affiche l'évolution de la grille dans le terminal.  
@@ -41,18 +43,27 @@ Ce projet propose :
 ## 📂 Structure du projet  
 
 ```plaintext
-Project2/
-├── Composants/
-│   ├── Cell.cpp / Cell.h           # Gestion des cellules
-│   ├── Grid.cpp / Grid.h           # Gestion de la grille
-├── Interface/
-│   ├── GraphicEngine.cpp / .h      # Rendu graphique
-│   ├── ModeConsole.cpp / .h        # Mode console
-│   ├── ModeGraphique.cpp / .h      # Mode graphique
-├── Service/
-│   ├── GameOfLife.cpp / .h         # Gestion principale du jeu
-├── main.cpp                        # Point d'entrée du programme
-└── README.md                       # Documentation
+/src
+├── /composants
+│   ├── Cellule.cpp
+│   ├── Cellule.h
+│   ├── Grille.cpp
+│   ├── Grille.h
+├── /service
+│   ├── GestionFichier.cpp
+│   ├── GestionFichier.h
+├── /ihm
+│   ├── ModeJeu.h
+│   ├── ModeConsole.cpp
+│   ├── ModeConsole.h
+│   ├── ModeGraphique.cpp
+│   ├── ModeGraphique.h
+│   ├── Interface.cpp
+│   ├── Interface.h
+├── JeuDeLaVie.cpp
+├── JeuDeLaVie.h
+├── main.cpp
+
 ```
 
 ---
@@ -166,4 +177,33 @@ Ce projet est sous licence MIT. Consultez le fichier [LICENSE](./LICENSE) pour p
 ---
 
 **Merci d'utiliser le Jeu de la Vie ! Amusez-vous bien avec cette simulation captivante. 🌟**
+
+Voici une suggestion de présentation pour votre profil GitHub :  
+
+
+👋 **Bienvenue sur notre GitHub !**  
+
+Nous sommes **Malik** et **Kaoutar**, deux étudiants développeurs passionnés, actuellement en formation au **CESI d'Alger**. 🚀  
+
+💻 **Qui sommes-nous ?**  
+- 🎓 Étudiants en ingénierie, spécialisés en développement logiciel.  
+- 💡 Toujours en quête de nouveaux défis techniques et projets innovants.  
+- 🤝 Collaboration, apprentissage et créativité sont au cœur de notre approche.  
+
+🎮 **Nos passions :**  
+Quand nous ne codons pas, nous sommes sur **Valorant** 🎯, où nous travaillons en équipe, développons nos stratégies et affinons notre coordination (des compétences bien utiles dans le développement, non ? 😄).  
+
+🌟 **Ce que vous trouverez ici :**  
+- Des projets étudiants ambitieux.  
+- Des solutions originales à des problèmes techniques.  
+- Des expérimentations avec de nouvelles technologies.  
+
+N'hésitez pas à explorer nos dépôts et à nous contacter si vous voulez collaborer ou discuter technique. On adore partager et apprendre  ! 🤗  
+
+📫 **Contactez-nous :**  
+- Malik : malik.mobarek.dz@viacesi.fr
+- Kaoutar : kaoutar.mahfouf.dz@viacesi.fr
+
+--- 
+
 
