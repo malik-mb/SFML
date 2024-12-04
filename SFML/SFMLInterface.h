@@ -15,7 +15,7 @@ public:
     bool estOuverte() const;
     void afficherGrille(const Grille& grille);
     // Déclaration modifiée de la fonction pour accepter un argument `int&`
-    void attendreEvenements(int& vitesseSimulation);  // Ajouter l'argument ici
+    void attendreEvenements(int& vitesseSimulation, bool& enPause);
 
 };
 

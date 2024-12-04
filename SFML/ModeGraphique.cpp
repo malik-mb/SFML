@@ -3,9 +3,8 @@
 
 // Constructeur de ModeGraphique
 ModeGraphique::ModeGraphique(const Grille& grille, std::unique_ptr<SFMLInterface> interface)
-    : ModeJeu(grille), interface(std::move(interface)) {
+    : ModeJeu(grille), interface(std::move(interface)), enPause(false) {
 }
-
 // Implémentation de lancerSimulation
 void ModeGraphique::lancerSimulation() {
     int vitesseSimulation = 1000;  // 1000ms = 1 seconde
@@ -13,19 +12,18 @@ void ModeGraphique::lancerSimulation() {
 
     // Boucle principale de simulation
     while (interface->estOuverte()) {
-        // Vérifier le temps écoulé pour savoir quand avancer l'itération
+        interface->attendreEvenements(vitesseSimulation, enPause); // Passe l'état enPause pour mise à jour
+
+        // Si la simulation est en pause, on saute la mise à jour de la grille
+        if (enPause) {
+            continue;
+        }
+
+        // Vérifier le temps écoulé pour avancer l'itération
         if (clock.getElapsedTime().asMilliseconds() >= vitesseSimulation) {
-            // Afficher la grille dans l'interface
-            interface->afficherGrille(grille);
-
-            // Gérer les événements utilisateur (fermeture, clic, etc.)
-            interface->attendreEvenements(vitesseSimulation);
-
-            // Calculer la prochaine itération
-            grille.calculerProchaineIteration();
-
-            // Réinitialiser l'horloge pour la prochaine itération
-            clock.restart();
+            interface->afficherGrille(grille); // Afficher la grille
+            grille.calculerProchaineIteration(); // Calculer la prochaine itération
+            clock.restart(); // Réinitialiser l'horloge
         }
     }
 }
