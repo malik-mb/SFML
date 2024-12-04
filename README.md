@@ -178,7 +178,8 @@ Ce projet est sous licence MIT. Consultez le fichier [LICENSE](./LICENSE) pour p
 
 **Merci d'utiliser le Jeu de la Vie ! Amusez-vous bien avec cette simulation captivante. 🌟**
 
-Voici une suggestion de présentation pour votre profil GitHub :  
+
+  
 
 
 👋 **Bienvenue sur notre GitHub !**  
