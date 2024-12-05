@@ -1,18 +1,37 @@
 #include "SFMLInterface.h"
 
 SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
-    : tailleCellule(tailleCellule) {
+    : tailleCellule(tailleCellule), enPleinEcran(true) {
     // Hauteur de la bande noire à ajouter en bas de l'écran
     const int hauteurBandeNoire = 40;
 
-    // Crée une fenêtre avec une taille qui inclut la grille et la bande noire
-    window.create(sf::VideoMode(largeur, hauteur + hauteurBandeNoire), "Simulation Graphique");
+    // Crée une fenêtre en mode plein écran
+    window.create(sf::VideoMode::getDesktopMode(), "Simulation Graphique", sf::Style::Fullscreen);
+
+    // Réinitialise la taille de la fenêtre si nécessaire
+    largeur = window.getSize().x;
+    hauteur = window.getSize().y;
 
     celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1)); // Légèrement plus petit
 
     if (!font.loadFromFile("C:\\Users\\malik\\Music\\VarelaRound-Regular.ttf")) {
         throw std::runtime_error("Erreur : Impossible de charger la police.");
     }
+    // Configuration du texte
+    messageTexte.setFont(font);
+    messageTexte.setString("Zoom In / Zoom Out");
+    messageTexte.setCharacterSize(20);
+    messageTexte.setFillColor(sf::Color::White);
+    messageTexte.setPosition(10, hauteur - 30);  // Déplacer le texte un peu au-dessus de la bande noire
+
+    // Configuration des boutons
+    boutonZoomIn.setSize(sf::Vector2f(100, 50));  // Taille du bouton
+    boutonZoomIn.setFillColor(sf::Color(100, 200, 100));  // Couleur du bouton Zoom In
+    boutonZoomIn.setPosition(largeur / 2 - 150, hauteur + hauteurBandeNoire - 70);  // Position du bouton Zoom In dans la bande noire
+
+    boutonZoomOut.setSize(sf::Vector2f(100, 50));  // Taille du bouton
+    boutonZoomOut.setFillColor(sf::Color(200, 100, 100));  // Couleur du bouton Zoom Out
+    boutonZoomOut.setPosition(largeur / 2 + 50, hauteur + hauteurBandeNoire - 70);  // Position du bouton Zoom Out dans la bande noire
 
     messageTexte.setFont(font);
     messageTexte.setString("Press Space to Pause");
@@ -77,6 +96,10 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
     );
     window.draw(messageTexte);
 
+    // Affichage des boutons dans la bande noire
+    window.draw(boutonZoomIn);
+    window.draw(boutonZoomOut);
+
     window.display();
 }
 
@@ -97,6 +120,17 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
             }
             if (event.key.code == sf::Keyboard::Space) {
                 enPause = !enPause; // Alterne l'état de pause
+            }
+            // Quitter le mode plein écran avec Échap
+            if (event.key.code == sf::Keyboard::Escape) {
+                if (enPleinEcran) {
+                    window.create(sf::VideoMode(800, 600), "Simulation Graphique", sf::Style::Close); // Crée une fenêtre fenêtrée
+                    enPleinEcran = false; // Passer en mode fenêtré
+                }
+                else {
+                    window.create(sf::VideoMode::getDesktopMode(), "Simulation Graphique", sf::Style::Fullscreen); // Repasser en plein écran
+                    enPleinEcran = true; // Retour en mode plein écran
+                }
             }
         }
     }

@@ -8,10 +8,12 @@ class SFMLInterface {
 private:
     sf::RenderWindow window;
     sf::RectangleShape celluleShape;
+    sf::RectangleShape boutonZoomIn;
+    sf::RectangleShape boutonZoomOut;
     sf::Font font; // Police pour le texte
     sf::Text messageTexte; // Texte affiché en bas
     int tailleCellule;
-
+    bool enPleinEcran;  // Variable pour savoir si la fenêtre est en plein écran ou pas
 public:
     SFMLInterface(int largeur, int hauteur, int tailleCellule); // Constructeur
     bool estOuverte() const;
@@ -19,6 +21,8 @@ public:
     // Déclaration modifiée de la fonction pour accepter un argument `int&`
     void attendreEvenements(int& vitesseSimulation, bool& enPause);
     bool chargerPolice(const std::string& cheminFichier);
+    void zoomIn();
+    void zoomOut();
 };
 
 #endif // SFMLINTERFACE_H
