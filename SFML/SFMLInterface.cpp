@@ -3,7 +3,17 @@
 SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     : tailleCellule(tailleCellule) {
     window.create(sf::VideoMode(largeur, hauteur), "Simulation Graphique");
-    celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1)); // Légèrement plus petit pour un effet de grille
+    celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1)); // Légèrement plus petit 
+    if (!font.loadFromFile("C:\\Users\\malik\\Music\\VarelaRound-Regular.ttf")) {
+        throw std::runtime_error("Erreur : Impossible de charger la police.");
+    }
+
+    // Configure le texte
+    messageTexte.setFont(font);
+    messageTexte.setString("Press Space to Pause");
+    messageTexte.setCharacterSize(20); // Taille de la police
+    messageTexte.setFillColor(sf::Color::White);
+
 }
 
 bool SFMLInterface::estOuverte() const {
@@ -47,6 +57,18 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
             window.draw(quad);
         }
     }
+    // Ajout d'une bande noire pour le texte
+    sf::RectangleShape bandeNoire(sf::Vector2f(window.getSize().x, 40));
+    bandeNoire.setPosition(0, window.getSize().y - 40);
+    bandeNoire.setFillColor(sf::Color::Black);
+    window.draw(bandeNoire);
+
+    // Affichage du texte
+    messageTexte.setPosition(
+        (window.getSize().x - messageTexte.getLocalBounds().width) / 2,
+        window.getSize().y - 30
+    );
+    window.draw(messageTexte);
 
     window.display();
 }

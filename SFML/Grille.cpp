@@ -47,12 +47,6 @@ void Grille::initialiserDepuisFichier(const std::string& chemin) {
         for (int j = 0; j < nbColonnes; ++j) {
             int etat;
             fichier >> etat;
-
-            if (fichier.fail() || (etat != 0 && etat != 1)) {
-                throw std::runtime_error("Valeur invalide dans la grille à la position (" +
-                    std::to_string(i) + ", " + std::to_string(j) + ").");
-            }
-
             cellules[i][j] = Cellule(etat == 1);
         }
     }
