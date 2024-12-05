@@ -4,16 +4,15 @@
 #include "ModeJeu.h"
 #include "SFMLInterface.h"
 #include <memory>
+#include <SFML/Graphics.hpp>
 
 class ModeGraphique : public ModeJeu {
 private:
     std::unique_ptr<SFMLInterface> interface;
-    bool enPause; // Indique si la simulation est en pause
-public:
-    // Constructeur prenant une référence constante pour la grille et un pointeur unique
-    ModeGraphique(const Grille& grille, std::unique_ptr<SFMLInterface> interface);
+    bool enPause;
 
-    // Implémentation de la simulation graphique
+public:
+    ModeGraphique(const Grille& grille, std::unique_ptr<SFMLInterface> interface);
     void lancerSimulation() override;
 };
 

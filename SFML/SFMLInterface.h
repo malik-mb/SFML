@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "Grille.h"
+#include <string>
+#include <memory>
 
 class SFMLInterface {
 private:
@@ -10,19 +12,37 @@ private:
     sf::RectangleShape celluleShape;
     sf::RectangleShape boutonZoomIn;
     sf::RectangleShape boutonZoomOut;
-    sf::Font font; // Police pour le texte
-    sf::Text messageTexte; // Texte affiché en bas
+    sf::RectangleShape boutonStart;
+    sf::RectangleShape boutonParams;
+    sf::RectangleShape boutonTutorial;
+    sf::RectangleShape boutonExit;
+
+    sf::Font font;
+    sf::Text messageTexte;
+    sf::Text startTexte;
+    sf::Text paramsTexte;
+    sf::Text tutorialTexte;
+    sf::Text exitTexte;
+    sf::Text titreTexte;
+
     int tailleCellule;
-    bool enPleinEcran;  // Variable pour savoir si la fenêtre est en plein écran ou pas
+    bool enPleinEcran;
+    bool enMenu;
+    bool enParams;
+    bool enTutorial;
+
 public:
-    SFMLInterface(int largeur, int hauteur, int tailleCellule); // Constructeur
+    SFMLInterface(int largeur, int hauteur, int tailleCellule);
     bool estOuverte() const;
     void afficherGrille(const Grille& grille);
-    // Déclaration modifiée de la fonction pour accepter un argument `int&`
+    void afficherMenu();
+    void afficherParametres();
+    void afficherTutorial();
     void attendreEvenements(int& vitesseSimulation, bool& enPause);
     bool chargerPolice(const std::string& cheminFichier);
     void zoomIn();
     void zoomOut();
+    bool estEnMenu() const { return enMenu; }
 };
 
 #endif // SFMLINTERFACE_H
