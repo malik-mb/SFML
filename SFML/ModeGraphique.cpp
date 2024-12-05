@@ -4,6 +4,7 @@
 // Constructeur de ModeGraphique
 ModeGraphique::ModeGraphique(const Grille& grille, std::unique_ptr<SFMLInterface> interface)
     : ModeJeu(grille), interface(std::move(interface)), enPause(true) { // Définir enPause sur true
+
 }
 
 // Implémentation de lancerSimulation

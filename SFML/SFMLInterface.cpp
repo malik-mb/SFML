@@ -2,45 +2,52 @@
 
 SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     : tailleCellule(tailleCellule) {
-    window.create(sf::VideoMode(largeur, hauteur), "Simulation Graphique");
-    celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1)); // Légèrement plus petit 
+    // Hauteur de la bande noire à ajouter en bas de l'écran
+    const int hauteurBandeNoire = 40;
+
+    // Crée une fenêtre avec une taille qui inclut la grille et la bande noire
+    window.create(sf::VideoMode(largeur, hauteur + hauteurBandeNoire), "Simulation Graphique");
+
+    celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1)); // Légèrement plus petit
+
     if (!font.loadFromFile("C:\\Users\\malik\\Music\\VarelaRound-Regular.ttf")) {
         throw std::runtime_error("Erreur : Impossible de charger la police.");
     }
 
-    // Configure le texte
     messageTexte.setFont(font);
     messageTexte.setString("Press Space to Pause");
     messageTexte.setCharacterSize(20); // Taille de la police
     messageTexte.setFillColor(sf::Color::White);
-
 }
 
 bool SFMLInterface::estOuverte() const {
     return window.isOpen();
 }
+
 void SFMLInterface::afficherGrille(const Grille& grille) {
     window.clear(sf::Color(50, 50, 50)); // Fond gris foncé
 
+    // Calcul de la taille de la grille (sans la bande noire)
+    int hauteurGrille = window.getSize().y - 40; // La hauteur de la grille est la hauteur de la fenêtre moins la hauteur de la bande noire
+
+    // Affichage de la grille
     for (int i = 0; i < grille.getNbLignes(); ++i) {
         for (int j = 0; j < grille.getNbColonnes(); ++j) {
-            // Créer un VertexArray pour chaque cellule
             sf::VertexArray quad(sf::Quads, 4);
 
-            // Définir les coins du quadrilatère (cellule)
+            // Calcul des coordonnées de la cellule, en s'assurant que la grille ne dépasse pas la fenêtre
             float x = j * tailleCellule;
             float y = i * tailleCellule;
             float size = tailleCellule - 1;  // Un peu de marge entre les cellules
 
-            // Choisir un dégradé basé sur la vivacité de la cellule (juste un exemple ici)
+            // Choisir une couleur en fonction de l'état de la cellule
             if (grille.getCellule(i, j).estVivante()) {
-                // Bleu à Violet
-                quad[0].color = sf::Color(0, 0, 255); // Bleu
-                quad[1].color = sf::Color(0, 0, 200); // Bleu sombre
-                quad[2].color = sf::Color(148, 0, 211); // Violet
+                quad[0].color = sf::Color(0, 0, 255);     // Bleu
+                quad[1].color = sf::Color(0, 0, 200);     // Bleu sombre
+                quad[2].color = sf::Color(148, 0, 211);  // Violet
                 quad[3].color = sf::Color(186, 85, 211); // Violet clair
-            } else {
-                // Gris clair à gris foncé pour les cellules mortes
+            }
+            else {
                 quad[0].color = sf::Color(169, 169, 169); // Gris clair
                 quad[1].color = sf::Color(169, 169, 169); // Gris clair
                 quad[2].color = sf::Color(105, 105, 105); // Gris sombre
@@ -53,20 +60,20 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
             quad[2].position = sf::Vector2f(x + size, y + size);
             quad[3].position = sf::Vector2f(x, y + size);
 
-            // Dessiner le quadrilatère (cellule) sur la fenêtre
             window.draw(quad);
         }
     }
-    // Ajout d'une bande noire pour le texte
+
+    // Bande noire en bas de l'écran (ne fait pas partie de la grille)
     sf::RectangleShape bandeNoire(sf::Vector2f(window.getSize().x, 40));
-    bandeNoire.setPosition(0, window.getSize().y - 40);
+    bandeNoire.setPosition(0, window.getSize().y - 40); // Placer la bande noire en bas
     bandeNoire.setFillColor(sf::Color::Black);
     window.draw(bandeNoire);
 
-    // Affichage du texte
+    // Affichage du texte "Press Space to Pause"
     messageTexte.setPosition(
         (window.getSize().x - messageTexte.getLocalBounds().width) / 2,
-        window.getSize().y - 30
+        window.getSize().y - 30  // Placer le texte à 10px au-dessus de la bande noire
     );
     window.draw(messageTexte);
 
@@ -94,5 +101,3 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
         }
     }
 }
-
-
