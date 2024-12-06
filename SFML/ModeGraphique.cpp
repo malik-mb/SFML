@@ -10,13 +10,13 @@ void ModeGraphique::lancerSimulation() {
     sf::Clock clock;
 
     while (interface->estOuverte()) {
-        if (interface->estEnMenu()) {
+        if (interface->enMenu) {  // Modification ici : accès direct au membre public
             interface->afficherMenu();
             interface->attendreEvenements(vitesseSimulation, enPause, grille);
             continue;
         }
 
-        interface->afficherGrille(grille);
+        interface->afficherGrille(grille, enPause);
         interface->attendreEvenements(vitesseSimulation, enPause, grille);
 
         if (enPause) {
