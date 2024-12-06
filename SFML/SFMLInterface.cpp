@@ -3,7 +3,8 @@
 #include <iostream>
 
 SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
-    : tailleCellule(tailleCellule), enPleinEcran(true), enMenu(true), musicPlaying(true) {
+    : tailleCellule(tailleCellule), enPleinEcran(true), enMenu(true), musicPlaying(true),
+    estEnTrainDeModifier(false), derniereCelluleModifiee(-1, -1) {
 
     // Création de la fenêtre en plein écran
     window.create(sf::VideoMode::getDesktopMode(), "Jeu de la Vie", sf::Style::Fullscreen);
@@ -48,10 +49,24 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     const float centreX = window.getSize().x / 2;
     const float premierBoutonY = window.getSize().y / 2;
 
-    // Configuration du bouton Start
+    // Configuration des boutons
     boutonStart.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
     boutonStart.setFillColor(sf::Color(50, 150, 50));
     boutonStart.setPosition(centreX - boutonLargeur / 2, premierBoutonY);
+
+    boutonParams.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
+    boutonParams.setFillColor(sf::Color(50, 150, 50));
+    boutonParams.setPosition(centreX - boutonLargeur / 2, premierBoutonY + boutonHauteur + espacementBoutons);
+
+    boutonTutorial.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
+    boutonTutorial.setFillColor(sf::Color(50, 150, 50));
+    boutonTutorial.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 2);
+
+    boutonExit.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
+    boutonExit.setFillColor(sf::Color(50, 150, 50));
+    boutonExit.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 3);
+
+    // Configuration des textes des boutons
     startTexte.setFont(font);
     startTexte.setString("START");
     startTexte.setCharacterSize(30);
@@ -61,10 +76,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         premierBoutonY + (boutonHauteur - startTexte.getLocalBounds().height) / 2
     );
 
-    // Configuration du bouton Paramètres
-    boutonParams.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
-    boutonParams.setFillColor(sf::Color(50, 150, 50));
-    boutonParams.setPosition(centreX - boutonLargeur / 2, premierBoutonY + boutonHauteur + espacementBoutons);
     paramsTexte.setFont(font);
     paramsTexte.setString("PARAMETRES");
     paramsTexte.setCharacterSize(30);
@@ -74,10 +85,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         premierBoutonY + boutonHauteur + espacementBoutons + (boutonHauteur - paramsTexte.getLocalBounds().height) / 2
     );
 
-    // Configuration du bouton Tutorial
-    boutonTutorial.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
-    boutonTutorial.setFillColor(sf::Color(50, 150, 50));
-    boutonTutorial.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 2);
     tutorialTexte.setFont(font);
     tutorialTexte.setString("TUTORIAL");
     tutorialTexte.setCharacterSize(30);
@@ -87,10 +94,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         premierBoutonY + (boutonHauteur + espacementBoutons) * 2 + (boutonHauteur - tutorialTexte.getLocalBounds().height) / 2
     );
 
-    // Configuration du bouton Exit
-    boutonExit.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
-    boutonExit.setFillColor(sf::Color(50, 150, 50));
-    boutonExit.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 3);
     exitTexte.setFont(font);
     exitTexte.setString("EXIT");
     exitTexte.setCharacterSize(30);
@@ -111,7 +114,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
 
     // Configuration du message
     messageTexte.setFont(font);
-    messageTexte.setString("Press Space to Pause");
+    messageTexte.setString("Maintenez le clic pour modifier les cellules");
     messageTexte.setCharacterSize(20);
     messageTexte.setFillColor(sf::Color::White);
     messageTexte.setPosition(10, window.getSize().y - 30);
@@ -128,6 +131,20 @@ void SFMLInterface::toggleMusic() {
     }
 }
 
+void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos) {
+    if (mousePos.y >= window.getSize().y - 40) {
+        return;
+    }
+
+    int colonne = mousePos.x / tailleCellule;
+    int ligne = mousePos.y / tailleCellule;
+
+    if (ligne >= 0 && ligne < grille.getNbLignes() && colonne >= 0 && colonne < grille.getNbColonnes()) {
+        Cellule& cellule = grille.getCellule(ligne, colonne);
+        cellule.setEtat(!cellule.estVivante());
+    }
+}
+
 bool SFMLInterface::estOuverte() const {
     return window.isOpen();
 }
@@ -135,10 +152,8 @@ bool SFMLInterface::estOuverte() const {
 void SFMLInterface::afficherMenu() {
     window.clear(sf::Color(30, 30, 30));
 
-    // Dessiner le titre
     window.draw(titreTexte);
 
-    // Effet de survol pour les boutons
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
     auto gererSurvol = [&](sf::RectangleShape& bouton) {
@@ -218,14 +233,34 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
     window.display();
 }
 
-void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
+void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille) {
+    // Gestion du clic maintenu
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !enMenu) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+        // Vérifier si on est sur les boutons de zoom
+        if (!boutonZoomIn.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
+            !boutonZoomOut.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+
+            int colonne = mousePos.x / tailleCellule;
+            int ligne = mousePos.y / tailleCellule;
+            sf::Vector2i celluleActuelle(colonne, ligne);
+
+            // Si on est sur une nouvelle cellule ou si c'est un nouveau clic
+            if (celluleActuelle != derniereCelluleModifiee || !estEnTrainDeModifier) {
+                toggleCelluleAvecSouris(grille, mousePos);
+                derniereCelluleModifiee = celluleActuelle;
+                estEnTrainDeModifier = true;
+            }
+        }
+    }
+
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             window.close();
         }
 
-        // Gestion de la musique
         if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
             toggleMusic();
         }
@@ -252,6 +287,27 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
             continue;
         }
 
+        // Gestion du clic simple et des autres événements
+        if (event.type == sf::Event::MouseButtonPressed) {
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+            if (boutonZoomIn.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                zoomIn();
+            }
+            else if (boutonZoomOut.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                zoomOut();
+            }
+            else {
+                estEnTrainDeModifier = true;
+                derniereCelluleModifiee = sf::Vector2i(mousePos.x / tailleCellule, mousePos.y / tailleCellule);
+                toggleCelluleAvecSouris(grille, mousePos);
+            }
+        }
+        else if (event.type == sf::Event::MouseButtonReleased) {
+            estEnTrainDeModifier = false;
+            derniereCelluleModifiee = sf::Vector2i(-1, -1);
+        }
+
         if (event.type == sf::Event::KeyPressed) {
             switch (event.key.code) {
             case sf::Keyboard::Right:
@@ -262,6 +318,12 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
                 break;
             case sf::Keyboard::Space:
                 enPause = !enPause;
+                if (enPause) {
+                    messageTexte.setString("PAUSE - Le jeu est en pause");
+                }
+                else {
+                    messageTexte.setString("Cliquez ou maintenez pour modifier les cellules");
+                }
                 break;
             case sf::Keyboard::Escape:
                 if (enPleinEcran) {
@@ -277,6 +339,7 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
                 break;
             }
         }
+    }
 
         if (event.type == sf::Event::MouseButtonPressed) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -287,9 +350,17 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause) {
             else if (boutonZoomOut.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                 zoomOut();
             }
+            else {
+                estEnTrainDeModifier = true;
+                derniereCelluleModifiee = sf::Vector2i(mousePos.x / tailleCellule, mousePos.y / tailleCellule);
+                toggleCelluleAvecSouris(grille, mousePos);
+            }
+        }
+        else if (event.type == sf::Event::MouseButtonReleased) {
+            estEnTrainDeModifier = false;
+            derniereCelluleModifiee = sf::Vector2i(-1, -1);
         }
     }
-}
 
 void SFMLInterface::zoomIn() {
     if (tailleCellule < 50) {

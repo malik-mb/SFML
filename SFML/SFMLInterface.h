@@ -34,17 +34,21 @@ private:
     bool enPleinEcran;
     bool enMenu;
 
+    sf::Vector2i derniereCelluleModifiee;
+    bool estEnTrainDeModifier;
+
 public:
     SFMLInterface(int largeur, int hauteur, int tailleCellule);
     bool estOuverte() const;
     void afficherGrille(const Grille& grille);
     void afficherMenu();
-    void attendreEvenements(int& vitesseSimulation, bool& enPause);
+    void attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille);
     bool chargerPolice(const std::string& cheminFichier);
     void zoomIn();
     void zoomOut();
     bool estEnMenu() const { return enMenu; }
     void toggleMusic();
+    void toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos);
 };
 
 #endif // SFMLINTERFACE_H
