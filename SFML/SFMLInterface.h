@@ -11,12 +11,15 @@ class SFMLInterface {
 private:
     sf::RenderWindow window;
     sf::RectangleShape celluleShape;
-    sf::RectangleShape boutonZoomIn;
-    sf::RectangleShape boutonZoomOut;
     sf::RectangleShape boutonStart;
     sf::RectangleShape boutonParams;
     sf::RectangleShape boutonTutorial;
     sf::RectangleShape boutonExit;
+
+    sf::Texture zoomInTexture;
+    sf::Texture zoomOutTexture;
+    sf::Sprite zoomInSprite;
+    sf::Sprite zoomOutSprite;
 
     sf::Font font;
     sf::Text messageTexte;
@@ -36,6 +39,8 @@ private:
 
     sf::Vector2i derniereCelluleModifiee;
     bool estEnTrainDeModifier;
+
+    const float BANDE_NOIRE_HAUTEUR = 100.0f;
 
 public:
     SFMLInterface(int largeur, int hauteur, int tailleCellule);

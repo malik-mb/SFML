@@ -3,7 +3,7 @@
 #include <iostream>
 
 SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
-    : tailleCellule(tailleCellule), enPleinEcran(true), enMenu(true), musicPlaying(true),
+    : tailleCellule(tailleCellule), enPleinEcran(true), enMenu(true), musicPlaying(false),
     estEnTrainDeModifier(false), derniereCelluleModifiee(-1, -1) {
 
     // Création de la fenêtre en plein écran
@@ -14,16 +14,46 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
 
     // Chargement de la police
     if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
-        throw std::runtime_error("Erreur : Impossible de charger la police.");
+        std::cerr << "Erreur : Impossible de charger la police." << std::endl;
     }
 
-    // Configuration de la musique
-    if (!menuMusic.openFromFile("C:\\Users\\malik\\Downloads\\PNL-Onizuka-_Instrumental_-Instrumentals.ogg")) {
-        throw std::runtime_error("Erreur : Impossible de charger la musique.");
+    // Chargement des textures de zoom
+    if (!zoomInTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-zoomer-48.png")) {
+        std::cerr << "Erreur : Impossible de charger l'icône de zoom in" << std::endl;
     }
-    menuMusic.setLoop(true);
-    menuMusic.setVolume(50.0f);
-    menuMusic.play();
+    if (!zoomOutTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-dézoomer-48.png")) {
+        std::cerr << "Erreur : Impossible de charger l'icône de zoom out" << std::endl;
+    }
+
+    // Configuration des sprites de zoom
+    zoomInSprite.setTexture(zoomInTexture);
+    zoomOutSprite.setTexture(zoomOutTexture);
+
+    // Positionnement des icônes de zoom en bas à droite
+    float spacing = 20.0f;
+    zoomOutSprite.setPosition(
+        window.getSize().x - zoomOutSprite.getGlobalBounds().width - spacing,
+        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - zoomOutSprite.getGlobalBounds().height / 2
+    );
+    zoomInSprite.setPosition(
+        zoomOutSprite.getPosition().x - zoomInSprite.getGlobalBounds().width - spacing,
+        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - zoomInSprite.getGlobalBounds().height / 2
+    );
+
+    // Configuration de la musique - Gestion plus souple des erreurs
+    bool musiqueChargee = false;
+    try {
+        if (menuMusic.openFromFile("C:\\Users\\malik\\Downloads\\PNL-Onizuka-_Instrumental_-Instrumentals.ogg")) {
+            menuMusic.setLoop(true);
+            menuMusic.setVolume(50.0f);
+            menuMusic.play();
+            musicPlaying = true;
+            musiqueChargee = true;
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Erreur lors du chargement de la musique : " << e.what() << std::endl;
+    }
 
     // Configuration du titre
     titreTexte.setFont(font);
@@ -65,7 +95,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     boutonExit.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
     boutonExit.setFillColor(sf::Color(50, 150, 50));
     boutonExit.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 3);
-
     // Configuration des textes des boutons
     startTexte.setFont(font);
     startTexte.setString("START");
@@ -103,21 +132,15 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         premierBoutonY + (boutonHauteur + espacementBoutons) * 3 + (boutonHauteur - exitTexte.getLocalBounds().height) / 2
     );
 
-    // Configuration des boutons de zoom
-    boutonZoomIn.setSize(sf::Vector2f(100, 50));
-    boutonZoomIn.setFillColor(sf::Color(100, 200, 100));
-    boutonZoomIn.setPosition(window.getSize().x / 2 - 150, window.getSize().y - 70);
-
-    boutonZoomOut.setSize(sf::Vector2f(100, 50));
-    boutonZoomOut.setFillColor(sf::Color(200, 100, 100));
-    boutonZoomOut.setPosition(window.getSize().x / 2 + 50, window.getSize().y - 70);
-
     // Configuration du message
     messageTexte.setFont(font);
-    messageTexte.setString("Maintenez le clic pour modifier les cellules");
+    messageTexte.setString("Cliquez ou maintenez pour modifier les cellules");
     messageTexte.setCharacterSize(20);
     messageTexte.setFillColor(sf::Color::White);
-    messageTexte.setPosition(10, window.getSize().y - 30);
+    messageTexte.setPosition(
+        (window.getSize().x - messageTexte.getLocalBounds().width) / 2,
+        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - messageTexte.getLocalBounds().height / 2
+    );
 }
 
 void SFMLInterface::toggleMusic() {
@@ -132,7 +155,8 @@ void SFMLInterface::toggleMusic() {
 }
 
 void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos) {
-    if (mousePos.y >= window.getSize().y - 40) {
+    // Vérifier si le clic est dans la zone de la grille (pas dans la bande noire)
+    if (mousePos.y >= window.getSize().y - BANDE_NOIRE_HAUTEUR) {
         return;
     }
 
@@ -154,6 +178,7 @@ void SFMLInterface::afficherMenu() {
 
     window.draw(titreTexte);
 
+    // Effet de survol pour les boutons
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
     auto gererSurvol = [&](sf::RectangleShape& bouton) {
@@ -182,75 +207,81 @@ void SFMLInterface::afficherMenu() {
 
     window.display();
 }
-
 void SFMLInterface::afficherGrille(const Grille& grille) {
     window.clear(sf::Color(50, 50, 50));
 
+    // Calculer la zone d'affichage de la grille (sans la bande noire)
+    int hauteurGrille = window.getSize().y - BANDE_NOIRE_HAUTEUR;
+
     for (int i = 0; i < grille.getNbLignes(); ++i) {
         for (int j = 0; j < grille.getNbColonnes(); ++j) {
-            sf::VertexArray quad(sf::Quads, 4);
+            // Ne dessiner que si la cellule est au-dessus de la bande noire
+            if (i * tailleCellule < hauteurGrille) {
+                sf::VertexArray quad(sf::Quads, 4);
+                float x = static_cast<float>(j * tailleCellule);
+                float y = static_cast<float>(i * tailleCellule);
+                float size = static_cast<float>(tailleCellule - 1);
 
-            float x = static_cast<float>(j * tailleCellule);
-            float y = static_cast<float>(i * tailleCellule);
-            float size = static_cast<float>(tailleCellule - 1);
+                if (grille.getCellule(i, j).estVivante()) {
+                    quad[0].color = sf::Color(0, 0, 255);
+                    quad[1].color = sf::Color(0, 0, 200);
+                    quad[2].color = sf::Color(148, 0, 211);
+                    quad[3].color = sf::Color(186, 85, 211);
+                }
+                else {
+                    quad[0].color = sf::Color(169, 169, 169);
+                    quad[1].color = sf::Color(169, 169, 169);
+                    quad[2].color = sf::Color(105, 105, 105);
+                    quad[3].color = sf::Color(105, 105, 105);
+                }
 
-            if (grille.getCellule(i, j).estVivante()) {
-                quad[0].color = sf::Color(0, 0, 255);
-                quad[1].color = sf::Color(0, 0, 200);
-                quad[2].color = sf::Color(148, 0, 211);
-                quad[3].color = sf::Color(186, 85, 211);
+                quad[0].position = sf::Vector2f(x, y);
+                quad[1].position = sf::Vector2f(x + size, y);
+                quad[2].position = sf::Vector2f(x + size, y + size);
+                quad[3].position = sf::Vector2f(x, y + size);
+
+                window.draw(quad);
             }
-            else {
-                quad[0].color = sf::Color(169, 169, 169);
-                quad[1].color = sf::Color(169, 169, 169);
-                quad[2].color = sf::Color(105, 105, 105);
-                quad[3].color = sf::Color(105, 105, 105);
-            }
-
-            quad[0].position = sf::Vector2f(x, y);
-            quad[1].position = sf::Vector2f(x + size, y);
-            quad[2].position = sf::Vector2f(x + size, y + size);
-            quad[3].position = sf::Vector2f(x, y + size);
-
-            window.draw(quad);
         }
     }
 
-    sf::RectangleShape bandeNoire(sf::Vector2f(static_cast<float>(window.getSize().x), 40.0f));
-    bandeNoire.setPosition(0, static_cast<float>(window.getSize().y - 40));
+    // Dessiner la bande noire
+    sf::RectangleShape bandeNoire(sf::Vector2f(static_cast<float>(window.getSize().x), BANDE_NOIRE_HAUTEUR));
+    bandeNoire.setPosition(0, static_cast<float>(window.getSize().y - BANDE_NOIRE_HAUTEUR));
     bandeNoire.setFillColor(sf::Color::Black);
     window.draw(bandeNoire);
 
+    // Dessiner le message
     messageTexte.setPosition(
         (window.getSize().x - messageTexte.getLocalBounds().width) / 2,
-        window.getSize().y - 30
+        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - messageTexte.getLocalBounds().height / 2
     );
     window.draw(messageTexte);
 
-    window.draw(boutonZoomIn);
-    window.draw(boutonZoomOut);
+    // Dessiner les icônes de zoom
+    window.draw(zoomInSprite);
+    window.draw(zoomOutSprite);
 
     window.display();
 }
 
 void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille) {
     // Gestion du clic maintenu
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !enMenu) {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !enMenu && estEnTrainDeModifier) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
         // Vérifier si on est sur les boutons de zoom
-        if (!boutonZoomIn.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
-            !boutonZoomOut.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+        if (!zoomInSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
+            !zoomOutSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 
             int colonne = mousePos.x / tailleCellule;
             int ligne = mousePos.y / tailleCellule;
             sf::Vector2i celluleActuelle(colonne, ligne);
 
-            // Si on est sur une nouvelle cellule ou si c'est un nouveau clic
-            if (celluleActuelle != derniereCelluleModifiee || !estEnTrainDeModifier) {
+            // Si on est sur une nouvelle cellule
+            if (celluleActuelle != derniereCelluleModifiee) {
                 toggleCelluleAvecSouris(grille, mousePos);
                 derniereCelluleModifiee = celluleActuelle;
-                estEnTrainDeModifier = true;
             }
         }
     }
@@ -271,8 +302,9 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
 
                 if (boutonStart.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                     enMenu = false;
-                    enPause = false;
+                    enPause = true;  // Démarrer en pause
                     menuMusic.stop();
+                    messageTexte.setString("PAUSE - Appuyez sur ESPACE pour démarrer");
                 }
                 else if (boutonParams.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                     messageTexte.setString("Les parametres seront bientot disponibles!");
@@ -287,14 +319,13 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             continue;
         }
 
-        // Gestion du clic simple et des autres événements
         if (event.type == sf::Event::MouseButtonPressed) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-            if (boutonZoomIn.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            if (zoomInSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                 zoomIn();
             }
-            else if (boutonZoomOut.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            else if (zoomOutSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                 zoomOut();
             }
             else {
@@ -304,8 +335,10 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             }
         }
         else if (event.type == sf::Event::MouseButtonReleased) {
-            estEnTrainDeModifier = false;
-            derniereCelluleModifiee = sf::Vector2i(-1, -1);
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                estEnTrainDeModifier = false;
+                derniereCelluleModifiee = sf::Vector2i(-1, -1);
+            }
         }
 
         if (event.type == sf::Event::KeyPressed) {
@@ -340,27 +373,7 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             }
         }
     }
-
-        if (event.type == sf::Event::MouseButtonPressed) {
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
-            if (boutonZoomIn.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                zoomIn();
-            }
-            else if (boutonZoomOut.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                zoomOut();
-            }
-            else {
-                estEnTrainDeModifier = true;
-                derniereCelluleModifiee = sf::Vector2i(mousePos.x / tailleCellule, mousePos.y / tailleCellule);
-                toggleCelluleAvecSouris(grille, mousePos);
-            }
-        }
-        else if (event.type == sf::Event::MouseButtonReleased) {
-            estEnTrainDeModifier = false;
-            derniereCelluleModifiee = sf::Vector2i(-1, -1);
-        }
-    }
+}
 
 void SFMLInterface::zoomIn() {
     if (tailleCellule < 50) {
