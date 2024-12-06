@@ -1,4 +1,3 @@
-Je vais intégrer un sommaire et ajouter le diagramme fourni à la documentation. Voici la version mise à jour avec un sommaire et l'inclusion du diagramme :
 
 ---
 
