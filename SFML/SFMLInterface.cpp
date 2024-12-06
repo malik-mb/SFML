@@ -6,34 +6,25 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     : tailleCellule(tailleCellule), enPleinEcran(true), enMenu(true), musicPlaying(false),
     estEnTrainDeModifier(false), derniereCelluleModifiee(-1, -1) {
 
-    // Création de la fenêtre en plein écran
     window.create(sf::VideoMode::getDesktopMode(), "Jeu de la Vie", sf::Style::Fullscreen);
-
-    // Configuration de la forme des cellules
     celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
 
-    // Chargement de la police
     if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
         std::cerr << "Erreur : Impossible de charger la police." << std::endl;
     }
 
-    // Chargement des textures de zoom
     if (!zoomInTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-zoomer-48.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône de zoom in" << std::endl;
     }
     if (!zoomOutTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-dézoomer-48.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône de zoom out" << std::endl;
     }
-
-    // Chargement des textures undo/redo
     if (!undoTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-gauche-2-50.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône undo" << std::endl;
     }
     if (!redoTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-droit-2-60.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône redo" << std::endl;
     }
-
-    // Chargement des textures pause/play
     if (!pauseTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-pause-48.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône de pause" << std::endl;
     }
@@ -41,7 +32,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         std::cerr << "Erreur : Impossible de charger l'icône de play" << std::endl;
     }
 
-    // Configuration des sprites
     zoomInSprite.setTexture(zoomInTexture);
     zoomOutSprite.setTexture(zoomOutTexture);
     undoSprite.setTexture(undoTexture);
@@ -49,7 +39,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     pauseSprite.setTexture(pauseTexture);
     playSprite.setTexture(playTexture);
 
-    // Positionnement des icônes de zoom en bas à droite
     float spacing = 20.0f;
     zoomOutSprite.setPosition(
         window.getSize().x - zoomOutSprite.getGlobalBounds().width - spacing,
@@ -60,17 +49,14 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - zoomInSprite.getGlobalBounds().height / 2
     );
 
-    // Positionnement des icônes undo/redo et pause/play autour du centre
     float messageX = window.getSize().x / 2;
     float messageY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2;
 
-    // Positionner undo à gauche
     undoSprite.setPosition(
         messageX - undoSprite.getGlobalBounds().width - spacing * 2,
         messageY - undoSprite.getGlobalBounds().height / 2
     );
 
-    // Positionner pause/play au centre
     pauseSprite.setPosition(
         messageX - pauseSprite.getGlobalBounds().width / 2,
         messageY - pauseSprite.getGlobalBounds().height / 2
@@ -80,18 +66,16 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         messageY - playSprite.getGlobalBounds().height / 2
     );
 
-    // Positionner redo à droite
     redoSprite.setPosition(
         messageX + spacing * 2,
         messageY - redoSprite.getGlobalBounds().height / 2
     );
 
-    // Configuration du message (vide maintenant)
     messageTexte.setFont(font);
     messageTexte.setString("");
     messageTexte.setCharacterSize(20);
     messageTexte.setFillColor(sf::Color::White);
-    // Configuration de la musique
+
     try {
         if (menuMusic.openFromFile("C:\\Users\\malik\\Downloads\\PNL-Onizuka-_Instrumental_-Instrumentals.ogg")) {
             menuMusic.setLoop(true);
@@ -104,7 +88,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         std::cerr << "Erreur lors du chargement de la musique : " << e.what() << std::endl;
     }
 
-    // Configuration du titre
     titreTexte.setFont(font);
     titreTexte.setString("Jeu de la Vie");
     titreTexte.setCharacterSize(50);
@@ -114,21 +97,18 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         window.getSize().y / 4
     );
 
-    // Configuration du texte de musique
     musicTexte.setFont(font);
     musicTexte.setString("Appuyez sur M pour activer/desactiver la musique");
     musicTexte.setCharacterSize(20);
     musicTexte.setFillColor(sf::Color::White);
     musicTexte.setPosition(10, window.getSize().y - 30);
 
-    // Configuration des boutons du menu
     const float boutonLargeur = 200;
     const float boutonHauteur = 60;
     const float espacementBoutons = 20;
     const float centreX = window.getSize().x / 2;
     const float premierBoutonY = window.getSize().y / 2;
 
-    // Configuration des boutons
     boutonStart.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
     boutonStart.setFillColor(sf::Color(50, 150, 50));
     boutonStart.setPosition(centreX - boutonLargeur / 2, premierBoutonY);
@@ -145,7 +125,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     boutonExit.setFillColor(sf::Color(50, 150, 50));
     boutonExit.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 3);
 
-    // Configuration des textes des boutons
     startTexte.setFont(font);
     startTexte.setString("START");
     startTexte.setCharacterSize(30);
@@ -238,6 +217,81 @@ void SFMLInterface::redo(Grille& grille) {
     }
 }
 
+void SFMLInterface::ajouterPattern(Grille& grille, const std::vector<std::pair<int, int>>& coords, int ligneBase, int colonneBase) {
+    sauvegarderEtat(grille);
+    for (const auto& coord : coords) {
+        int ligne = ligneBase + coord.first;
+        int colonne = colonneBase + coord.second;
+        if (ligne >= 0 && ligne < grille.getNbLignes() &&
+            colonne >= 0 && colonne < grille.getNbColonnes()) {
+            grille.getCellule(ligne, colonne).setEtat(true);
+        }
+    }
+}
+
+void SFMLInterface::ajouterPlaneur(Grille& grille, int ligneBase, int colonneBase) {
+    std::vector<std::pair<int, int>> planeur = {
+        {0, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}
+    };
+    ajouterPattern(grille, planeur, ligneBase, colonneBase);
+}
+
+void SFMLInterface::ajouterCanon(Grille& grille, int ligneBase, int colonneBase) {
+    std::vector<std::pair<int, int>> canon = {
+        {0, 24},
+        {1, 22}, {1, 24},
+        {2, 12}, {2, 13}, {2, 20}, {2, 21}, {2, 34}, {2, 35},
+        {3, 11}, {3, 15}, {3, 20}, {3, 21}, {3, 34}, {3, 35},
+        {4, 0}, {4, 1}, {4, 10}, {4, 16}, {4, 20}, {4, 21},
+        {5, 0}, {5, 1}, {5, 10}, {5, 14}, {5, 16}, {5, 17}, {5, 22}, {5, 24},
+        {6, 10}, {6, 16}, {6, 24},
+        {7, 11}, {7, 15},
+        {8, 12}, {8, 13}
+    };
+    ajouterPattern(grille, canon, ligneBase, colonneBase);
+}
+
+void SFMLInterface::ajouterOscillateur(Grille& grille, int ligneBase, int colonneBase) {
+    std::vector<std::pair<int, int>> oscillateur = {
+        {0, 1}, {1, 1}, {2, 1}
+    };
+    ajouterPattern(grille, oscillateur, ligneBase, colonneBase);
+}
+
+void SFMLInterface::ajouterVaisseau(Grille& grille, int ligneBase, int colonneBase) {
+    std::vector<std::pair<int, int>> vaisseau = {
+        {0, 1}, {0, 2}, {0, 3}, {0, 4},
+        {1, 0}, {1, 4},
+        {2, 4},
+        {3, 0}, {3, 3}
+    };
+    ajouterPattern(grille, vaisseau, ligneBase, colonneBase);
+}
+
+void SFMLInterface::ajouterPentadecathlon(Grille& grille, int ligneBase, int colonneBase) {
+    std::vector<std::pair<int, int>> pentadecathlon = {
+        {0, 1}, {1, 1}, {2, 0}, {2, 2}, {3, 1}, {4, 1},
+        {5, 1}, {6, 1}, {7, 0}, {7, 2}, {8, 1}, {9, 1}
+    };
+    ajouterPattern(grille, pentadecathlon, ligneBase, colonneBase);
+}
+
+void SFMLInterface::ajouterPulsar(Grille& grille, int ligneBase, int colonneBase) {
+    std::vector<std::pair<int, int>> pulsar = {
+        {2, 4}, {2, 5}, {2, 6}, {2, 10}, {2, 11}, {2, 12},
+        {4, 2}, {4, 7}, {4, 9}, {4, 14},
+        {5, 2}, {5, 7}, {5, 9}, {5, 14},
+        {6, 2}, {6, 7}, {6, 9}, {6, 14},
+        {7, 4}, {7, 5}, {7, 6}, {7, 10}, {7, 11}, {7, 12},
+        {9, 4}, {9, 5}, {9, 6}, {9, 10}, {9, 11}, {9, 12},
+        {10, 2}, {10, 7}, {10, 9}, {10, 14},
+        {11, 2}, {11, 7}, {11, 9}, {11, 14},
+        {12, 2}, {12, 7}, {12, 9}, {12, 14},
+        {14, 4}, {14, 5}, {14, 6}, {14, 10}, {14, 11}, {14, 12}
+    };
+    ajouterPattern(grille, pulsar, ligneBase, colonneBase);
+}
+
 void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos) {
     if (mousePos.y >= window.getSize().y - BANDE_NOIRE_HAUTEUR) {
         return;
@@ -287,6 +341,7 @@ void SFMLInterface::afficherMenu() {
 
     window.display();
 }
+
 void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.clear(sf::Color(50, 50, 50));
 
@@ -383,6 +438,79 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                     redo(grille);
                 }
             }
+
+            // Ajout des touches pour les patterns
+            if (!enMenu) {
+                switch (event.key.code) {
+                case sf::Keyboard::P:  // Planeur
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    int ligne = mousePos.y / tailleCellule;
+                    int colonne = mousePos.x / tailleCellule;
+                    ajouterPlaneur(grille, ligne, colonne);
+                    break;
+                }
+                case sf::Keyboard::C:  // Canon
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    int ligne = mousePos.y / tailleCellule;
+                    int colonne = mousePos.x / tailleCellule;
+                    ajouterCanon(grille, ligne, colonne);
+                    break;
+                }
+                case sf::Keyboard::O:  // Oscillateur
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    int ligne = mousePos.y / tailleCellule;
+                    int colonne = mousePos.x / tailleCellule;
+                    ajouterOscillateur(grille, ligne, colonne);
+                    break;
+                }
+                case sf::Keyboard::V:  // Vaisseau
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    int ligne = mousePos.y / tailleCellule;
+                    int colonne = mousePos.x / tailleCellule;
+                    ajouterVaisseau(grille, ligne, colonne);
+                    break;
+                }
+                case sf::Keyboard::D:  // Pentadecathlon
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    int ligne = mousePos.y / tailleCellule;
+                    int colonne = mousePos.x / tailleCellule;
+                    ajouterPentadecathlon(grille, ligne, colonne);
+                    break;
+                }
+                case sf::Keyboard::U:  // Pulsar
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    int ligne = mousePos.y / tailleCellule;
+                    int colonne = mousePos.x / tailleCellule;
+                    ajouterPulsar(grille, ligne, colonne);
+                    break;
+                }
+                case sf::Keyboard::Right:
+                    vitesseSimulation = std::max(vitesseSimulation - 200, 100);
+                    break;
+                case sf::Keyboard::Left:
+                    vitesseSimulation = std::min(vitesseSimulation + 200, 2000);
+                    break;
+                case sf::Keyboard::Space:
+                    enPause = !enPause;
+                    break;
+                case sf::Keyboard::Escape:
+                    if (enPleinEcran) {
+                        window.create(sf::VideoMode(800, 600), "Jeu de la Vie", sf::Style::Close);
+                        enPleinEcran = false;
+                    }
+                    else {
+                        window.create(sf::VideoMode::getDesktopMode(), "Jeu de la Vie", sf::Style::Fullscreen);
+                        enPleinEcran = true;
+                    }
+                    break;
+                }
+            }
         }
 
         if (enMenu) {
@@ -437,32 +565,6 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             if (event.mouseButton.button == sf::Mouse::Left) {
                 estEnTrainDeModifier = false;
                 derniereCelluleModifiee = sf::Vector2i(-1, -1);
-            }
-        }
-
-        if (event.type == sf::Event::KeyPressed) {
-            switch (event.key.code) {
-            case sf::Keyboard::Right:
-                vitesseSimulation = std::max(vitesseSimulation - 200, 100);
-                break;
-            case sf::Keyboard::Left:
-                vitesseSimulation = std::min(vitesseSimulation + 200, 2000);
-                break;
-            case sf::Keyboard::Space:
-                enPause = !enPause;
-                break;
-            case sf::Keyboard::Escape:
-                if (enPleinEcran) {
-                    window.create(sf::VideoMode(800, 600), "Jeu de la Vie", sf::Style::Close);
-                    enPleinEcran = false;
-                }
-                else {
-                    window.create(sf::VideoMode::getDesktopMode(), "Jeu de la Vie", sf::Style::Fullscreen);
-                    enPleinEcran = true;
-                }
-                break;
-            default:
-                break;
             }
         }
     }
