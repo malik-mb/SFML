@@ -13,6 +13,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         std::cerr << "Erreur : Impossible de charger la police." << std::endl;
     }
 
+    // Chargement des textures
     if (!zoomInTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-zoomer-48.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône de zoom in" << std::endl;
     }
@@ -31,15 +32,86 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     if (!playTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-lecture-50.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône de play" << std::endl;
     }
+    if (!resetTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-mises-à-jour-disponibles-50.png")) {
+        std::cerr << "Erreur : Impossible de charger l'icône de reset" << std::endl;
+    }
+    if (!oscillateurTexture.loadFromFile("C:\\Users\\malik\\Music\\oss.png")) {
+        std::cerr << "Erreur : Impossible de charger l'image de l'oscillateur" << std::endl;
+    }
+    if (!planeurTexture.loadFromFile("C:\\Users\\malik\\Music\\plan.png")) {
+        std::cerr << "Erreur : Impossible de charger l'image du planeur" << std::endl;
+    }
+    if (!canonTexture.loadFromFile("C:\\Users\\malik\\Music\\canon.png")) {
+        std::cerr << "Erreur : Impossible de charger l'image du canon" << std::endl;
+    }
 
+    // Configuration des sprites
     zoomInSprite.setTexture(zoomInTexture);
     zoomOutSprite.setTexture(zoomOutTexture);
     undoSprite.setTexture(undoTexture);
     redoSprite.setTexture(redoTexture);
     pauseSprite.setTexture(pauseTexture);
     playSprite.setTexture(playTexture);
+    resetSprite.setTexture(resetTexture);
+    oscillateurSprite.setTexture(oscillateurTexture);
+    planeurSprite.setTexture(planeurTexture);
+    canonSprite.setTexture(canonTexture);
+
+    // Redimensionnement des sprites de pattern
+    float patternSize = 40.0f;
+    float scale;
+
+    scale = patternSize / oscillateurSprite.getGlobalBounds().width;
+    oscillateurSprite.setScale(scale, scale);
+    scale = patternSize / planeurSprite.getGlobalBounds().width;
+    planeurSprite.setScale(scale, scale);
+    scale = patternSize / canonSprite.getGlobalBounds().width;
+    canonSprite.setScale(scale, scale);
 
     float spacing = 20.0f;
+
+    // Positionnement des sprites
+    resetSprite.setPosition(
+        spacing,
+        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - resetSprite.getGlobalBounds().height / 2
+    );
+
+    // Position des patterns dans la bande noire
+    float startX = resetSprite.getPosition().x + resetSprite.getGlobalBounds().width + 20.0f;
+    float patternY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - patternSize / 2;
+    float spacingPatterns = 120.0f;
+
+    oscillateurSprite.setPosition(startX, patternY);
+    planeurSprite.setPosition(startX + spacingPatterns, patternY);
+    canonSprite.setPosition(startX + spacingPatterns * 2, patternY);
+    // Configuration des textes des patterns
+    oscillateurTexte.setFont(font);
+    oscillateurTexte.setString("Press O");
+    oscillateurTexte.setCharacterSize(12);
+    oscillateurTexte.setFillColor(sf::Color::White);
+    oscillateurTexte.setPosition(
+        oscillateurSprite.getPosition().x,
+        oscillateurSprite.getPosition().y + oscillateurSprite.getGlobalBounds().height + 5
+    );
+
+    planeurTexte.setFont(font);
+    planeurTexte.setString("Press P");
+    planeurTexte.setCharacterSize(12);
+    planeurTexte.setFillColor(sf::Color::White);
+    planeurTexte.setPosition(
+        planeurSprite.getPosition().x,
+        planeurSprite.getPosition().y + planeurSprite.getGlobalBounds().height + 5
+    );
+
+    canonTexte.setFont(font);
+    canonTexte.setString("Press C");
+    canonTexte.setCharacterSize(12);
+    canonTexte.setFillColor(sf::Color::White);
+    canonTexte.setPosition(
+        canonSprite.getPosition().x,
+        canonSprite.getPosition().y + canonSprite.getGlobalBounds().height + 5
+    );
+
     zoomOutSprite.setPosition(
         window.getSize().x - zoomOutSprite.getGlobalBounds().width - spacing,
         window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - zoomOutSprite.getGlobalBounds().height / 2
@@ -76,6 +148,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     messageTexte.setCharacterSize(20);
     messageTexte.setFillColor(sf::Color::White);
 
+    // Configuration de la musique
     try {
         if (menuMusic.openFromFile("C:\\Users\\malik\\Downloads\\PNL-Onizuka-_Instrumental_-Instrumentals.ogg")) {
             menuMusic.setLoop(true);
@@ -88,6 +161,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         std::cerr << "Erreur lors du chargement de la musique : " << e.what() << std::endl;
     }
 
+    // Configuration du menu
     titreTexte.setFont(font);
     titreTexte.setString("Jeu de la Vie");
     titreTexte.setCharacterSize(50);
@@ -96,7 +170,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         (window.getSize().x - titreTexte.getLocalBounds().width) / 2,
         window.getSize().y / 4
     );
-
     musicTexte.setFont(font);
     musicTexte.setString("Appuyez sur M pour activer/desactiver la musique");
     musicTexte.setCharacterSize(20);
@@ -161,6 +234,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         premierBoutonY + (boutonHauteur + espacementBoutons) * 3 + (boutonHauteur - exitTexte.getLocalBounds().height) / 2
     );
 }
+
 void SFMLInterface::toggleMusic() {
     if (musicPlaying) {
         menuMusic.pause();
@@ -172,6 +246,14 @@ void SFMLInterface::toggleMusic() {
     }
 }
 
+void SFMLInterface::resetGrille(Grille& grille) {
+    sauvegarderEtat(grille);
+    for (int i = 0; i < grille.getNbLignes(); ++i) {
+        for (int j = 0; j < grille.getNbColonnes(); ++j) {
+            grille.getCellule(i, j).setEtat(false);
+        }
+    }
+}
 void SFMLInterface::sauvegarderEtat(const Grille& grille) {
     undoStack.push(captureEtatGrille(grille));
     while (!redoStack.empty()) {
@@ -257,57 +339,6 @@ void SFMLInterface::ajouterOscillateur(Grille& grille, int ligneBase, int colonn
     };
     ajouterPattern(grille, oscillateur, ligneBase, colonneBase);
 }
-
-void SFMLInterface::ajouterVaisseau(Grille& grille, int ligneBase, int colonneBase) {
-    std::vector<std::pair<int, int>> vaisseau = {
-        {0, 1}, {0, 2}, {0, 3}, {0, 4},
-        {1, 0}, {1, 4},
-        {2, 4},
-        {3, 0}, {3, 3}
-    };
-    ajouterPattern(grille, vaisseau, ligneBase, colonneBase);
-}
-
-void SFMLInterface::ajouterPentadecathlon(Grille& grille, int ligneBase, int colonneBase) {
-    std::vector<std::pair<int, int>> pentadecathlon = {
-        {0, 1}, {1, 1}, {2, 0}, {2, 2}, {3, 1}, {4, 1},
-        {5, 1}, {6, 1}, {7, 0}, {7, 2}, {8, 1}, {9, 1}
-    };
-    ajouterPattern(grille, pentadecathlon, ligneBase, colonneBase);
-}
-
-void SFMLInterface::ajouterPulsar(Grille& grille, int ligneBase, int colonneBase) {
-    std::vector<std::pair<int, int>> pulsar = {
-        {2, 4}, {2, 5}, {2, 6}, {2, 10}, {2, 11}, {2, 12},
-        {4, 2}, {4, 7}, {4, 9}, {4, 14},
-        {5, 2}, {5, 7}, {5, 9}, {5, 14},
-        {6, 2}, {6, 7}, {6, 9}, {6, 14},
-        {7, 4}, {7, 5}, {7, 6}, {7, 10}, {7, 11}, {7, 12},
-        {9, 4}, {9, 5}, {9, 6}, {9, 10}, {9, 11}, {9, 12},
-        {10, 2}, {10, 7}, {10, 9}, {10, 14},
-        {11, 2}, {11, 7}, {11, 9}, {11, 14},
-        {12, 2}, {12, 7}, {12, 9}, {12, 14},
-        {14, 4}, {14, 5}, {14, 6}, {14, 10}, {14, 11}, {14, 12}
-    };
-    ajouterPattern(grille, pulsar, ligneBase, colonneBase);
-}
-
-void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos) {
-    if (mousePos.y >= window.getSize().y - BANDE_NOIRE_HAUTEUR) {
-        return;
-    }
-
-    sauvegarderEtat(grille);
-
-    int colonne = mousePos.x / tailleCellule;
-    int ligne = mousePos.y / tailleCellule;
-
-    if (ligne >= 0 && ligne < grille.getNbLignes() && colonne >= 0 && colonne < grille.getNbColonnes()) {
-        Cellule& cellule = grille.getCellule(ligne, colonne);
-        cellule.setEtat(!cellule.estVivante());
-    }
-}
-
 void SFMLInterface::afficherMenu() {
     window.clear(sf::Color(30, 30, 30));
 
@@ -383,10 +414,20 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     bandeNoire.setFillColor(sf::Color::Black);
     window.draw(bandeNoire);
 
+    // Dessiner tous les sprites et textes
+    window.draw(resetSprite);
     window.draw(zoomInSprite);
     window.draw(zoomOutSprite);
     window.draw(undoSprite);
     window.draw(redoSprite);
+
+    // Dessiner les patterns et leurs textes
+    window.draw(oscillateurSprite);
+    window.draw(planeurSprite);
+    window.draw(canonSprite);
+    window.draw(oscillateurTexte);
+    window.draw(planeurTexte);
+    window.draw(canonTexte);
 
     if (enPause) {
         window.draw(playSprite);
@@ -397,7 +438,6 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
 
     window.display();
 }
-
 void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille) {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !enMenu && estEnTrainDeModifier) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -407,7 +447,8 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             !undoSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
             !redoSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
             !pauseSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
-            !playSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            !playSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
+            !resetSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 
             int colonne = mousePos.x / tailleCellule;
             int ligne = mousePos.y / tailleCellule;
@@ -439,7 +480,6 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                 }
             }
 
-            // Ajout des touches pour les patterns
             if (!enMenu) {
                 switch (event.key.code) {
                 case sf::Keyboard::P:  // Planeur
@@ -448,48 +488,27 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                     int ligne = mousePos.y / tailleCellule;
                     int colonne = mousePos.x / tailleCellule;
                     ajouterPlaneur(grille, ligne, colonne);
-                    break;
                 }
+                break;
                 case sf::Keyboard::C:  // Canon
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
                     int ligne = mousePos.y / tailleCellule;
                     int colonne = mousePos.x / tailleCellule;
                     ajouterCanon(grille, ligne, colonne);
-                    break;
                 }
+                break;
                 case sf::Keyboard::O:  // Oscillateur
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
                     int ligne = mousePos.y / tailleCellule;
                     int colonne = mousePos.x / tailleCellule;
                     ajouterOscillateur(grille, ligne, colonne);
-                    break;
                 }
-                case sf::Keyboard::V:  // Vaisseau
-                {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    int ligne = mousePos.y / tailleCellule;
-                    int colonne = mousePos.x / tailleCellule;
-                    ajouterVaisseau(grille, ligne, colonne);
+                break;
+                case sf::Keyboard::R:  // Reset
+                    resetGrille(grille);
                     break;
-                }
-                case sf::Keyboard::D:  // Pentadecathlon
-                {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    int ligne = mousePos.y / tailleCellule;
-                    int colonne = mousePos.x / tailleCellule;
-                    ajouterPentadecathlon(grille, ligne, colonne);
-                    break;
-                }
-                case sf::Keyboard::U:  // Pulsar
-                {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    int ligne = mousePos.y / tailleCellule;
-                    int colonne = mousePos.x / tailleCellule;
-                    ajouterPulsar(grille, ligne, colonne);
-                    break;
-                }
                 case sf::Keyboard::Right:
                     vitesseSimulation = std::max(vitesseSimulation - 200, 100);
                     break;
@@ -539,7 +558,10 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
         if (event.type == sf::Event::MouseButtonPressed) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-            if (zoomInSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            if (resetSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                resetGrille(grille);
+            }
+            else if (zoomInSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                 zoomIn();
             }
             else if (zoomOutSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
@@ -567,6 +589,21 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                 derniereCelluleModifiee = sf::Vector2i(-1, -1);
             }
         }
+    }
+}
+
+void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos) {
+    if (mousePos.y >= window.getSize().y - BANDE_NOIRE_HAUTEUR) {
+        return;
+    }
+
+    int colonne = mousePos.x / tailleCellule;
+    int ligne = mousePos.y / tailleCellule;
+
+    if (ligne >= 0 && ligne < grille.getNbLignes() && colonne >= 0 && colonne < grille.getNbColonnes()) {
+        sauvegarderEtat(grille);
+        Cellule& cellule = grille.getCellule(ligne, colonne);
+        cellule.setEtat(!cellule.estVivante());
     }
 }
 

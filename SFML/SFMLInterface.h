@@ -27,6 +27,10 @@ private:
     sf::Texture redoTexture;
     sf::Texture pauseTexture;
     sf::Texture playTexture;
+    sf::Texture resetTexture;
+    sf::Texture oscillateurTexture;
+    sf::Texture planeurTexture;
+    sf::Texture canonTexture;
 
     sf::Sprite zoomInSprite;
     sf::Sprite zoomOutSprite;
@@ -34,6 +38,14 @@ private:
     sf::Sprite redoSprite;
     sf::Sprite pauseSprite;
     sf::Sprite playSprite;
+    sf::Sprite resetSprite;
+    sf::Sprite oscillateurSprite;
+    sf::Sprite planeurSprite;
+    sf::Sprite canonSprite;
+
+    sf::Text oscillateurTexte;
+    sf::Text planeurTexte;
+    sf::Text canonTexte;
 
     sf::Music menuMusic;
 
@@ -52,12 +64,10 @@ private:
     void ajouterPlaneur(Grille& grille, int ligneBase, int colonneBase);
     void ajouterCanon(Grille& grille, int ligneBase, int colonneBase);
     void ajouterOscillateur(Grille& grille, int ligneBase, int colonneBase);
-    void ajouterVaisseau(Grille& grille, int ligneBase, int colonneBase);
-    void ajouterPentadecathlon(Grille& grille, int ligneBase, int colonneBase);
-    void ajouterPulsar(Grille& grille, int ligneBase, int colonneBase);
+    void resetGrille(Grille& grille);
 
 public:
-    bool enMenu; // Déplacé en public ou utilisez des getters/setters
+    bool enMenu;
 
     SFMLInterface(int largeur, int hauteur, int tailleCellule);
     void afficherGrille(const Grille& grille, bool enPause);
@@ -74,8 +84,4 @@ public:
     std::vector<std::vector<bool>> captureEtatGrille(const Grille& grille);
     void appliquerEtatGrille(Grille& grille, const std::vector<std::vector<bool>>& etat);
     void toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos);
-
-    // Optionnel : Ajoutez ces getters/setters si vous préférez garder enMenu privé
-    // bool getEnMenu() const { return enMenu; }
-    // void setEnMenu(bool value) { enMenu = value; }
 };
