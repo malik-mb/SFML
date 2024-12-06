@@ -4,7 +4,7 @@
 
 SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     : tailleCellule(tailleCellule), enPleinEcran(true), enMenu(true), musicPlaying(false),
-    estEnTrainDeModifier(false), derniereCelluleModifiee(-1, -1), volume(50.0f), isMuted(false) {
+    estEnTrainDeModifier(false), derniereCelluleModifiee(-1, -1), volume(50.0f), isMuted(false), currentSpeed(50.0f) {
 
     window.create(sf::VideoMode::getDesktopMode(), "Jeu de la Vie", sf::Style::Fullscreen);
     celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
@@ -50,6 +50,9 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     if (!soundTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-son-64.png")) {
         std::cerr << "Erreur : Impossible de charger l'icône son" << std::endl;
     }
+    if (!speedTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-éclair-48.png")) {
+        std::cerr << "Erreur : Impossible de charger l'icône de vitesse" << std::endl;
+    }
 
     // Configuration des sprites
     zoomInSprite.setTexture(zoomInTexture);
@@ -64,8 +67,9 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     canonSprite.setTexture(canonTexture);
     muteSprite.setTexture(muteTexture);
     soundSprite.setTexture(soundTexture);
+    speedSprite.setTexture(speedTexture);
 
-    // Redimensionnement des sprites de pattern
+    // Redimensionnement des sprites
     float patternSize = 40.0f;
     float scale;
 
@@ -76,34 +80,79 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     scale = patternSize / canonSprite.getGlobalBounds().width;
     canonSprite.setScale(scale, scale);
 
-    // Redimensionner les icônes de son
-    float soundIconSize = 30.0f;
-    scale = soundIconSize / muteSprite.getGlobalBounds().width;
+    // Redimensionner les icônes de son et de vitesse
+    float iconSize = 30.0f;
+    scale = iconSize / muteSprite.getGlobalBounds().width;
     muteSprite.setScale(scale, scale);
-    scale = soundIconSize / soundSprite.getGlobalBounds().width;
+    scale = iconSize / soundSprite.getGlobalBounds().width;
     soundSprite.setScale(scale, scale);
-    // Configuration de la barre de volume
-    float volumeBarWidth = 100.0f;
-    float volumeBarHeight = 5.0f;
-    float volumeSliderSize = 10.0f;
+    scale = iconSize / speedSprite.getGlobalBounds().width;
+    speedSprite.setScale(scale, scale);
+    // Configuration des barres de volume et de vitesse
+    float barWidth = 100.0f;
+    float barHeight = 5.0f;
+    float sliderSize = 10.0f;
 
-    volumeBar.setSize(sf::Vector2f(volumeBarWidth, volumeBarHeight));
+    volumeBar.setSize(sf::Vector2f(barWidth, barHeight));
     volumeBar.setFillColor(sf::Color(100, 100, 100));
-
-    volumeSlider.setSize(sf::Vector2f(volumeSliderSize, volumeSliderSize));
+    volumeSlider.setSize(sf::Vector2f(sliderSize, sliderSize));
     volumeSlider.setFillColor(sf::Color::White);
 
+    speedBar.setSize(sf::Vector2f(barWidth, barHeight));
+    speedBar.setFillColor(sf::Color(100, 100, 100));
+    speedSlider.setSize(sf::Vector2f(sliderSize, sliderSize));
+    speedSlider.setFillColor(sf::Color::White);
+
+    // Positionnement des éléments
     float spacing = 20.0f;
     float rightMargin = spacing;
-    float volumeY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2;
+    float controlsY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2;
 
-    // Positionnement des sprites
-    resetSprite.setPosition(
-        spacing,
-        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - resetSprite.getGlobalBounds().height / 2
+    // Position des contrôles à droite
+    zoomOutSprite.setPosition(
+        window.getSize().x - zoomOutSprite.getGlobalBounds().width - rightMargin,
+        controlsY - zoomOutSprite.getGlobalBounds().height / 2
     );
 
-    // Position des patterns dans la bande noire
+    zoomInSprite.setPosition(
+        zoomOutSprite.getPosition().x - zoomInSprite.getGlobalBounds().width - rightMargin,
+        controlsY - zoomInSprite.getGlobalBounds().height / 2
+    );
+
+    volumeBar.setPosition(
+        zoomInSprite.getPosition().x - volumeBar.getSize().x - rightMargin * 2,
+        controlsY
+    );
+
+    soundSprite.setPosition(
+        volumeBar.getPosition().x - soundSprite.getGlobalBounds().width - rightMargin,
+        controlsY - soundSprite.getGlobalBounds().height / 2
+    );
+
+    muteSprite.setPosition(soundSprite.getPosition());
+
+    speedBar.setPosition(
+        soundSprite.getPosition().x - speedBar.getSize().x - rightMargin * 2,
+        controlsY
+    );
+
+    speedSprite.setPosition(
+        speedBar.getPosition().x - speedSprite.getGlobalBounds().width - rightMargin,
+        controlsY - speedSprite.getGlobalBounds().height / 2
+    );
+
+    updateVolumeSlider();
+    updateSpeedSlider();
+
+    // Position des contrôles au centre
+    float centerX = window.getSize().x / 2;
+
+    resetSprite.setPosition(
+        spacing,
+        controlsY - resetSprite.getGlobalBounds().height / 2
+    );
+
+    // Position des patterns
     float startX = resetSprite.getPosition().x + resetSprite.getGlobalBounds().width + 20.0f;
     float patternY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - patternSize / 2;
     float spacingPatterns = 120.0f;
@@ -112,51 +161,23 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     planeurSprite.setPosition(startX + spacingPatterns, patternY);
     canonSprite.setPosition(startX + spacingPatterns * 2, patternY);
 
-    // Positionnement des contrôles de volume et zoom
-    zoomOutSprite.setPosition(
-        window.getSize().x - zoomOutSprite.getGlobalBounds().width - rightMargin,
-        volumeY - zoomOutSprite.getGlobalBounds().height / 2
-    );
-
-    zoomInSprite.setPosition(
-        zoomOutSprite.getPosition().x - zoomInSprite.getGlobalBounds().width - rightMargin,
-        volumeY - zoomInSprite.getGlobalBounds().height / 2
-    );
-
-    volumeBar.setPosition(
-        zoomInSprite.getPosition().x - volumeBarWidth - rightMargin * 2,
-        volumeY
-    );
-
-    soundSprite.setPosition(
-        volumeBar.getPosition().x - soundSprite.getGlobalBounds().width - rightMargin,
-        volumeY - soundSprite.getGlobalBounds().height / 2
-    );
-
-    muteSprite.setPosition(soundSprite.getPosition());
-
-    updateVolumeSlider();
-
-    float messageX = window.getSize().x / 2;
-    float messageY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2;
-
     undoSprite.setPosition(
-        messageX - undoSprite.getGlobalBounds().width - spacing * 2,
-        messageY - undoSprite.getGlobalBounds().height / 2
+        centerX - undoSprite.getGlobalBounds().width - spacing * 2,
+        controlsY - undoSprite.getGlobalBounds().height / 2
     );
 
     pauseSprite.setPosition(
-        messageX - pauseSprite.getGlobalBounds().width / 2,
-        messageY - pauseSprite.getGlobalBounds().height / 2
+        centerX - pauseSprite.getGlobalBounds().width / 2,
+        controlsY - pauseSprite.getGlobalBounds().height / 2
     );
     playSprite.setPosition(
-        messageX - playSprite.getGlobalBounds().width / 2,
-        messageY - playSprite.getGlobalBounds().height / 2
+        centerX - playSprite.getGlobalBounds().width / 2,
+        controlsY - playSprite.getGlobalBounds().height / 2
     );
 
     redoSprite.setPosition(
-        messageX + spacing * 2,
-        messageY - redoSprite.getGlobalBounds().height / 2
+        centerX + spacing * 2,
+        controlsY - redoSprite.getGlobalBounds().height / 2
     );
 
     // Configuration des textes des patterns
@@ -186,11 +207,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         canonSprite.getPosition().x,
         canonSprite.getPosition().y + canonSprite.getGlobalBounds().height + 5
     );
-    messageTexte.setFont(font);
-    messageTexte.setString("");
-    messageTexte.setCharacterSize(20);
-    messageTexte.setFillColor(sf::Color::White);
-
     // Configuration de la musique
     try {
         if (menuMusic.openFromFile("C:\\Users\\malik\\Downloads\\PNL-Onizuka-_Instrumental_-Instrumentals.ogg")) {
@@ -213,12 +229,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         (window.getSize().x - titreTexte.getLocalBounds().width) / 2,
         window.getSize().y / 4
     );
-
-    musicTexte.setFont(font);
-    musicTexte.setString("Appuyez sur M pour activer/desactiver la musique");
-    musicTexte.setCharacterSize(20);
-    musicTexte.setFillColor(sf::Color::White);
-    musicTexte.setPosition(10, window.getSize().y - 30);
 
     const float boutonLargeur = 200;
     const float boutonHauteur = 60;
@@ -285,6 +295,12 @@ void SFMLInterface::updateVolumeSlider() {
     volumeSlider.setPosition(sliderX, sliderY);
 }
 
+void SFMLInterface::updateSpeedSlider() {
+    float sliderX = speedBar.getPosition().x + (currentSpeed / 100.0f) * speedBar.getSize().x - speedSlider.getSize().x / 2;
+    float sliderY = speedBar.getPosition().y - speedSlider.getSize().y / 2 + speedBar.getSize().y / 2;
+    speedSlider.setPosition(sliderX, sliderY);
+}
+
 void SFMLInterface::handleVolumeControl(const sf::Vector2i& mousePos) {
     if (volumeBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
         volumeSlider.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
@@ -294,23 +310,19 @@ void SFMLInterface::handleVolumeControl(const sf::Vector2i& mousePos) {
         menuMusic.setVolume(isMuted ? 0 : volume);
         updateVolumeSlider();
     }
-    else if (soundSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
-        muteSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-        isMuted = !isMuted;
-        menuMusic.setVolume(isMuted ? 0 : volume);
-    }
-}
-void SFMLInterface::toggleMusic() {
-    if (musicPlaying) {
-        menuMusic.pause();
-        musicPlaying = false;
-    }
-    else {
-        menuMusic.play();
-        musicPlaying = true;
-    }
 }
 
+void SFMLInterface::handleSpeedControl(const sf::Vector2i& mousePos, int& vitesseSimulation) {
+    if (speedBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
+        speedSlider.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+        float relativeX = mousePos.x - speedBar.getPosition().x;
+        currentSpeed = (relativeX / speedBar.getSize().x) * 100;
+        currentSpeed = std::max(0.0f, std::min(100.0f, currentSpeed));
+        // Convertir currentSpeed (0-100) en vitesseSimulation (2000-50)
+        vitesseSimulation = 2000 - ((currentSpeed / 100.0f) * 1950);
+        updateSpeedSlider();
+    }
+}
 void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.clear(sf::Color(50, 50, 50));
 
@@ -347,6 +359,7 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
         }
     }
 
+    // Dessiner la bande noire
     sf::RectangleShape bandeNoire(sf::Vector2f(static_cast<float>(window.getSize().x), BANDE_NOIRE_HAUTEUR));
     bandeNoire.setPosition(0, static_cast<float>(window.getSize().y - BANDE_NOIRE_HAUTEUR));
     bandeNoire.setFillColor(sf::Color::Black);
@@ -358,9 +371,16 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.draw(zoomOutSprite);
     window.draw(undoSprite);
     window.draw(redoSprite);
+
+    // Dessiner les contrôles de volume
     window.draw(volumeBar);
     window.draw(volumeSlider);
     window.draw(isMuted ? muteSprite : soundSprite);
+
+    // Dessiner les contrôles de vitesse
+    window.draw(speedBar);
+    window.draw(speedSlider);
+    window.draw(speedSprite);
 
     // Dessiner les patterns et leurs textes
     window.draw(oscillateurSprite);
@@ -370,6 +390,7 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.draw(planeurTexte);
     window.draw(canonTexte);
 
+    // Dessiner le bouton play/pause
     if (enPause) {
         window.draw(playSprite);
     }
@@ -415,12 +436,19 @@ void SFMLInterface::afficherMenu() {
 }
 void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille) {
     static bool isDraggingVolume = false;
+    static bool isDraggingSpeed = false;
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
+        // Gestion du contrôle de la vitesse
+        if (isDraggingSpeed || speedBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
+            speedSlider.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            isDraggingSpeed = true;
+            handleSpeedControl(mousePos, vitesseSimulation);
+        }
         // Gestion du contrôle du volume
-        if (isDraggingVolume || volumeBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
+        else if (isDraggingVolume || volumeBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
             volumeSlider.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             isDraggingVolume = true;
             handleVolumeControl(mousePos);
@@ -447,6 +475,7 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
         }
     }
     else {
+        isDraggingSpeed = false;
         isDraggingVolume = false;
     }
 
@@ -471,6 +500,19 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
 
             if (!enMenu) {
                 switch (event.key.code) {
+                case sf::Keyboard::R:  // Ajouter cette case
+                    resetGrille(grille);
+                    break;
+                case sf::Keyboard::Left:
+                    currentSpeed = std::max(0.0f, currentSpeed - 5.0f);
+                    vitesseSimulation = 2000 - ((currentSpeed / 100.0f) * 1950);
+                    updateSpeedSlider();
+                    break;
+                case sf::Keyboard::Right:  // Accélérer
+                    currentSpeed = std::min(100.0f, currentSpeed + 5.0f);
+                    vitesseSimulation = 2000 - ((currentSpeed / 100.0f) * 1950);
+                    updateSpeedSlider();
+                    break;
                 case sf::Keyboard::P:
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -495,15 +537,6 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                     ajouterOscillateur(grille, ligne, colonne);
                 }
                 break;
-                case sf::Keyboard::R:
-                    resetGrille(grille);
-                    break;
-                case sf::Keyboard::Right:
-                    vitesseSimulation = std::max(vitesseSimulation - 200, 100);
-                    break;
-                case sf::Keyboard::Left:
-                    vitesseSimulation = std::min(vitesseSimulation + 200, 2000);
-                    break;
                 case sf::Keyboard::Space:
                     enPause = !enPause;
                     break;
@@ -528,14 +561,6 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                 if (boutonStart.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                     enMenu = false;
                     enPause = true;
-                    menuMusic.stop();
-                    messageTexte.setString("");
-                }
-                else if (boutonParams.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                    messageTexte.setString("");
-                }
-                else if (boutonTutorial.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                    messageTexte.setString("");
                 }
                 else if (boutonExit.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                     window.close();
@@ -577,9 +602,43 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             if (event.mouseButton.button == sf::Mouse::Left) {
                 estEnTrainDeModifier = false;
                 derniereCelluleModifiee = sf::Vector2i(-1, -1);
-                isDraggingVolume = false;
             }
         }
+    }
+}
+
+void SFMLInterface::toggleMusic() {
+    if (musicPlaying) {
+        menuMusic.pause();
+        musicPlaying = false;
+        isMuted = true;  // Ajouter cette ligne
+    }
+    else {
+        menuMusic.play();
+        musicPlaying = true;
+        isMuted = false;  // Ajouter cette ligne
+    }
+}
+
+
+bool SFMLInterface::estOuverte() const {
+    return window.isOpen();
+}
+
+bool SFMLInterface::chargerPolice(const std::string& cheminFichier) {
+    return font.loadFromFile(cheminFichier);
+}
+void SFMLInterface::zoomIn() {
+    if (tailleCellule < 50) {
+        tailleCellule += 2;
+        celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
+    }
+}
+
+void SFMLInterface::zoomOut() {
+    if (tailleCellule > 4) {
+        tailleCellule -= 2;
+        celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
     }
 }
 
@@ -598,27 +657,6 @@ void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& 
     }
 }
 
-void SFMLInterface::zoomIn() {
-    if (tailleCellule < 50) {
-        tailleCellule += 2;
-        celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
-    }
-}
-
-void SFMLInterface::zoomOut() {
-    if (tailleCellule > 4) {
-        tailleCellule -= 2;
-        celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
-    }
-}
-
-bool SFMLInterface::estOuverte() const {
-    return window.isOpen();
-}
-
-bool SFMLInterface::chargerPolice(const std::string& cheminFichier) {
-    return font.loadFromFile(cheminFichier);
-}
 void SFMLInterface::ajouterPattern(Grille& grille, const std::vector<std::pair<int, int>>& coords, int ligneBase, int colonneBase) {
     sauvegarderEtat(grille);
     for (const auto& coord : coords) {
