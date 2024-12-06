@@ -31,6 +31,8 @@ private:
     sf::Texture oscillateurTexture;
     sf::Texture planeurTexture;
     sf::Texture canonTexture;
+    sf::Texture muteTexture;
+    sf::Texture soundTexture;
 
     sf::Sprite zoomInSprite;
     sf::Sprite zoomOutSprite;
@@ -42,6 +44,13 @@ private:
     sf::Sprite oscillateurSprite;
     sf::Sprite planeurSprite;
     sf::Sprite canonSprite;
+    sf::Sprite muteSprite;
+    sf::Sprite soundSprite;
+
+    sf::RectangleShape volumeBar;
+    sf::RectangleShape volumeSlider;
+    float volume;
+    bool isMuted;
 
     sf::Text oscillateurTexte;
     sf::Text planeurTexte;
@@ -65,6 +74,8 @@ private:
     void ajouterCanon(Grille& grille, int ligneBase, int colonneBase);
     void ajouterOscillateur(Grille& grille, int ligneBase, int colonneBase);
     void resetGrille(Grille& grille);
+    void updateVolumeSlider();
+    void handleVolumeControl(const sf::Vector2i& mousePos);
 
 public:
     bool enMenu;
