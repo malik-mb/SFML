@@ -6,6 +6,7 @@
 #include "Grille.h"
 #include <string>
 #include <memory>
+#include <stack>
 
 class SFMLInterface {
 private:
@@ -21,13 +22,18 @@ private:
     sf::Sprite zoomInSprite;
     sf::Sprite zoomOutSprite;
 
+    sf::Texture undoTexture;
+    sf::Texture redoTexture;
+    sf::Sprite undoSprite;
+    sf::Sprite redoSprite;
+
     sf::Font font;
     sf::Text messageTexte;
+    sf::Text titreTexte;
     sf::Text startTexte;
     sf::Text paramsTexte;
     sf::Text tutorialTexte;
     sf::Text exitTexte;
-    sf::Text titreTexte;
     sf::Text musicTexte;
 
     sf::Music menuMusic;
@@ -40,7 +46,16 @@ private:
     sf::Vector2i derniereCelluleModifiee;
     bool estEnTrainDeModifier;
 
+    std::stack<std::vector<std::vector<bool>>> undoStack;
+    std::stack<std::vector<std::vector<bool>>> redoStack;
+
     const float BANDE_NOIRE_HAUTEUR = 100.0f;
+
+    void sauvegarderEtat(const Grille& grille);
+    void undo(Grille& grille);
+    void redo(Grille& grille);
+    std::vector<std::vector<bool>> captureEtatGrille(const Grille& grille);
+    void appliquerEtatGrille(Grille& grille, const std::vector<std::vector<bool>>& etat);
 
 public:
     SFMLInterface(int largeur, int hauteur, int tailleCellule);

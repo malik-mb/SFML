@@ -25,9 +25,19 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         std::cerr << "Erreur : Impossible de charger l'icône de zoom out" << std::endl;
     }
 
-    // Configuration des sprites de zoom
+    // Chargement des textures undo/redo
+    if (!undoTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-gauche-2-50.png")) {
+        std::cerr << "Erreur : Impossible de charger l'icône undo" << std::endl;
+    }
+    if (!redoTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-droit-2-60.png")) {
+        std::cerr << "Erreur : Impossible de charger l'icône redo" << std::endl;
+    }
+
+    // Configuration des sprites
     zoomInSprite.setTexture(zoomInTexture);
     zoomOutSprite.setTexture(zoomOutTexture);
+    undoSprite.setTexture(undoTexture);
+    redoSprite.setTexture(redoTexture);
 
     // Positionnement des icônes de zoom en bas à droite
     float spacing = 20.0f;
@@ -40,15 +50,36 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - zoomInSprite.getGlobalBounds().height / 2
     );
 
-    // Configuration de la musique - Gestion plus souple des erreurs
-    bool musiqueChargee = false;
+    // Configuration du message
+    messageTexte.setFont(font);
+    messageTexte.setString("Cliquez ou maintenez pour modifier les cellules");
+    messageTexte.setCharacterSize(20);
+    messageTexte.setFillColor(sf::Color::White);
+    messageTexte.setPosition(
+        (window.getSize().x - messageTexte.getLocalBounds().width) / 2,
+        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - messageTexte.getLocalBounds().height / 2
+    );
+
+    // Positionnement des icônes undo/redo autour du message
+    float messageX = (window.getSize().x - messageTexte.getLocalBounds().width) / 2;
+    float messageY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2;
+
+    undoSprite.setPosition(
+        messageX - undoSprite.getGlobalBounds().width - spacing * 2,
+        messageY - undoSprite.getGlobalBounds().height / 2
+    );
+
+    redoSprite.setPosition(
+        messageX + messageTexte.getLocalBounds().width + spacing * 2,
+        messageY - redoSprite.getGlobalBounds().height / 2
+    );
+    // Configuration de la musique
     try {
         if (menuMusic.openFromFile("C:\\Users\\malik\\Downloads\\PNL-Onizuka-_Instrumental_-Instrumentals.ogg")) {
             menuMusic.setLoop(true);
             menuMusic.setVolume(50.0f);
             menuMusic.play();
             musicPlaying = true;
-            musiqueChargee = true;
         }
     }
     catch (const std::exception& e) {
@@ -72,7 +103,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     musicTexte.setFillColor(sf::Color::White);
     musicTexte.setPosition(10, window.getSize().y - 30);
 
-    // Configuration commune pour tous les boutons
+    // Configuration des boutons du menu
     const float boutonLargeur = 200;
     const float boutonHauteur = 60;
     const float espacementBoutons = 20;
@@ -95,6 +126,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     boutonExit.setSize(sf::Vector2f(boutonLargeur, boutonHauteur));
     boutonExit.setFillColor(sf::Color(50, 150, 50));
     boutonExit.setPosition(centreX - boutonLargeur / 2, premierBoutonY + (boutonHauteur + espacementBoutons) * 3);
+
     // Configuration des textes des boutons
     startTexte.setFont(font);
     startTexte.setString("START");
@@ -113,7 +145,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         centreX - paramsTexte.getLocalBounds().width / 2,
         premierBoutonY + boutonHauteur + espacementBoutons + (boutonHauteur - paramsTexte.getLocalBounds().height) / 2
     );
-
     tutorialTexte.setFont(font);
     tutorialTexte.setString("TUTORIAL");
     tutorialTexte.setCharacterSize(30);
@@ -131,16 +162,6 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         centreX - exitTexte.getLocalBounds().width / 2,
         premierBoutonY + (boutonHauteur + espacementBoutons) * 3 + (boutonHauteur - exitTexte.getLocalBounds().height) / 2
     );
-
-    // Configuration du message
-    messageTexte.setFont(font);
-    messageTexte.setString("Cliquez ou maintenez pour modifier les cellules");
-    messageTexte.setCharacterSize(20);
-    messageTexte.setFillColor(sf::Color::White);
-    messageTexte.setPosition(
-        (window.getSize().x - messageTexte.getLocalBounds().width) / 2,
-        window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - messageTexte.getLocalBounds().height / 2
-    );
 }
 
 void SFMLInterface::toggleMusic() {
@@ -154,11 +175,59 @@ void SFMLInterface::toggleMusic() {
     }
 }
 
+void SFMLInterface::sauvegarderEtat(const Grille& grille) {
+    undoStack.push(captureEtatGrille(grille));
+    // Vider la pile redo quand une nouvelle action est effectuée
+    while (!redoStack.empty()) {
+        redoStack.pop();
+    }
+}
+
+std::vector<std::vector<bool>> SFMLInterface::captureEtatGrille(const Grille& grille) {
+    std::vector<std::vector<bool>> etat(grille.getNbLignes(),
+        std::vector<bool>(grille.getNbColonnes()));
+
+    for (int i = 0; i < grille.getNbLignes(); ++i) {
+        for (int j = 0; j < grille.getNbColonnes(); ++j) {
+            etat[i][j] = grille.getCellule(i, j).estVivante();
+        }
+    }
+    return etat;
+}
+
+void SFMLInterface::appliquerEtatGrille(Grille& grille, const std::vector<std::vector<bool>>& etat) {
+    for (int i = 0; i < grille.getNbLignes(); ++i) {
+        for (int j = 0; j < grille.getNbColonnes(); ++j) {
+            grille.getCellule(i, j).setEtat(etat[i][j]);
+        }
+    }
+}
+
+void SFMLInterface::undo(Grille& grille) {
+    if (!undoStack.empty()) {
+        redoStack.push(captureEtatGrille(grille));
+        auto previousState = undoStack.top();
+        undoStack.pop();
+        appliquerEtatGrille(grille, previousState);
+    }
+}
+
+void SFMLInterface::redo(Grille& grille) {
+    if (!redoStack.empty()) {
+        undoStack.push(captureEtatGrille(grille));
+        auto nextState = redoStack.top();
+        redoStack.pop();
+        appliquerEtatGrille(grille, nextState);
+    }
+}
 void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos) {
     // Vérifier si le clic est dans la zone de la grille (pas dans la bande noire)
     if (mousePos.y >= window.getSize().y - BANDE_NOIRE_HAUTEUR) {
         return;
     }
+
+    // Sauvegarder l'état avant la modification
+    sauvegarderEtat(grille);
 
     int colonne = mousePos.x / tailleCellule;
     int ligne = mousePos.y / tailleCellule;
@@ -167,10 +236,6 @@ void SFMLInterface::toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& 
         Cellule& cellule = grille.getCellule(ligne, colonne);
         cellule.setEtat(!cellule.estVivante());
     }
-}
-
-bool SFMLInterface::estOuverte() const {
-    return window.isOpen();
 }
 
 void SFMLInterface::afficherMenu() {
@@ -207,6 +272,7 @@ void SFMLInterface::afficherMenu() {
 
     window.display();
 }
+
 void SFMLInterface::afficherGrille(const Grille& grille) {
     window.clear(sf::Color(50, 50, 50));
 
@@ -215,7 +281,6 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
 
     for (int i = 0; i < grille.getNbLignes(); ++i) {
         for (int j = 0; j < grille.getNbColonnes(); ++j) {
-            // Ne dessiner que si la cellule est au-dessus de la bande noire
             if (i * tailleCellule < hauteurGrille) {
                 sf::VertexArray quad(sf::Quads, 4);
                 float x = static_cast<float>(j * tailleCellule);
@@ -244,7 +309,6 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
             }
         }
     }
-
     // Dessiner la bande noire
     sf::RectangleShape bandeNoire(sf::Vector2f(static_cast<float>(window.getSize().x), BANDE_NOIRE_HAUTEUR));
     bandeNoire.setPosition(0, static_cast<float>(window.getSize().y - BANDE_NOIRE_HAUTEUR));
@@ -258,21 +322,25 @@ void SFMLInterface::afficherGrille(const Grille& grille) {
     );
     window.draw(messageTexte);
 
-    // Dessiner les icônes de zoom
+    // Dessiner les icônes
     window.draw(zoomInSprite);
     window.draw(zoomOutSprite);
+    window.draw(undoSprite);
+    window.draw(redoSprite);
 
     window.display();
 }
 
 void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille) {
     // Gestion du clic maintenu
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !enMenu && estEnTrainDeModifier) {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !enMenu && estEnTrainDeModifier) {  // Ajout de estEnTrainDeModifier
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-        // Vérifier si on est sur les boutons de zoom
+        // Vérifier si on est sur les boutons
         if (!zoomInSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
-            !zoomOutSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            !zoomOutSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
+            !undoSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
+            !redoSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 
             int colonne = mousePos.x / tailleCellule;
             int ligne = mousePos.y / tailleCellule;
@@ -292,17 +360,27 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             window.close();
         }
 
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
-            toggleMusic();
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::M) {
+                toggleMusic();
+            }
+            // Gestion de Ctrl+Z et Ctrl+Y
+            if (event.key.control) {
+                if (event.key.code == sf::Keyboard::Z) {
+                    undo(grille);
+                }
+                else if (event.key.code == sf::Keyboard::Y) {
+                    redo(grille);
+                }
+            }
         }
-
         if (enMenu) {
             if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
                 if (boutonStart.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                     enMenu = false;
-                    enPause = true;  // Démarrer en pause
+                    enPause = true;
                     menuMusic.stop();
                     messageTexte.setString("PAUSE - Appuyez sur ESPACE pour démarrer");
                 }
@@ -327,6 +405,12 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
             }
             else if (zoomOutSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
                 zoomOut();
+            }
+            else if (undoSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                undo(grille);
+            }
+            else if (redoSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                redo(grille);
             }
             else {
                 estEnTrainDeModifier = true;
@@ -387,6 +471,10 @@ void SFMLInterface::zoomOut() {
         tailleCellule -= 2;
         celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
     }
+}
+
+bool SFMLInterface::estOuverte() const {
+    return window.isOpen();
 }
 
 bool SFMLInterface::chargerPolice(const std::string& cheminFichier) {
