@@ -7,7 +7,7 @@
 #include "GestionFichier.h"
 
 int main() {
-    int nbLignes = 20, nbColonnes = 20;
+    int nbLignes = 49, nbColonnes = 96;
     Grille grille(nbLignes, nbColonnes);
 
     // Demander le chemin du fichier
