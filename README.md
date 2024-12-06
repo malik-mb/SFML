@@ -1,34 +1,57 @@
+Je vais intégrer un sommaire et ajouter le diagramme fourni à la documentation. Voici la version mise à jour avec un sommaire et l'inclusion du diagramme :
 
+---
 
 # 🌍 Jeu de la Vie 🌟 🧬
 
 Un projet de simulation du célèbre **Jeu de la Vie** de John Conway, implémenté en **C++** avec deux modes : une interface graphique utilisant **SFML** et un mode console. 🎮  
+
+---
+
+## 📑 Sommaire  
+
+1. [Description](#-description)  
+2. [Fonctionnalités](#-fonctionnalités)  
+   - Modes d'exécution  
+   - Grille torique  
+   - Configuration personnalisable  
+3. [Structure du projet](#-structure-du-projet)  
+4. [Installation](#️-installation)  
+5. [Fichier d'entrée](#-fichier-dentrée)  
+6. [Utilisation](#-utilisation)  
+   - Commandes en mode graphique  
+7. [Diagramme UML](#-diagramme-uml)  
+8. [Tests Unitaires](#-tests-unitaires)  
+9. [Contributions](#-contributions)  
+10. [Licence](#-licence)  
+
+---
 
 ## 📝 Description  
 
 Le **Jeu de la Vie** est un automate cellulaire conçu par le mathématicien **John Conway**. Il simule l'évolution d'une population de cellules vivantes dans une grille selon des règles simples :  
 
 - 🟢 Une cellule **vivante** reste vivante si elle a **2 ou 3 voisins vivants**, sinon elle meurt.  
-- ⚫ Une cellule **morte** devient vivante si elle a exactement **3 voisins vivants**.
-- . ☠️ Sinon, la cellule meurt ou reste morte.
+- ⚫ Une cellule **morte** devient vivante si elle a exactement **3 voisins vivants**.  
+- ☠️ Sinon, la cellule meurt ou reste morte.  
 
-
-Ce projet propose :  
+Ce projet propose :  
 - 🌌 **Mode Console** : Affiche l'évolution de la grille dans le terminal.  
-- 🎨 **Mode Graphique** : Visualisation interactive avec SFML.  
+- 🎨 **Mode Graphique** : Visualisation interactive avec **SFML**.  
 
 ---
 
 ## 🚀 Fonctionnalités  
 
 ### 1️⃣ Modes d'exécution  
-- **Mode Console** :  
-  - Affiche la grille à chaque génération dans le terminal.  
-  - Simplicité et rapidité d'exécution.  
 
-- **Mode Graphique** :  
-  - Interface visuelle élégante avec **SFML**.  
-  - Contrôle interactif de la vitesse via le clavier (`+` et `-`).  
+#### Mode Console  
+- Affiche la grille à chaque génération dans le terminal.  
+- Simplicité et rapidité d'exécution.  
+
+#### Mode Graphique  
+- Interface visuelle élégante avec **SFML**.  
+- Contrôle interactif de la vitesse via le clavier (`+` et `-`).  
 
 ### 2️⃣ Grille torique  
 - Les cellules en bord de grille sont connectées avec celles du côté opposé, créant une grille "circulaire". 🌐  
@@ -63,7 +86,6 @@ Ce projet propose :
 ├── JeuDeLaVie.cpp
 ├── JeuDeLaVie.h
 ├── main.cpp
-
 ```
 
 ---
@@ -138,6 +160,14 @@ Pour initialiser la grille, fournissez un fichier d'entrée au format suivant :
 
 ---
 
+## 📊 Diagramme UML  
+
+Voici un diagramme UML des cas d'utilisation pour le projet :  
+
+![Diagramme UML](attachment://Capture-d'écran-2024-11-28-204742.png)  
+
+---
+
 ## 🧪 Tests Unitaires  
 
 Le projet inclut des tests unitaires utilisant **Google Test** pour valider :  
@@ -169,15 +199,6 @@ Les contributions sont les bienvenues ! Suivez ces étapes pour participer :
 4. Poussez vos changements et ouvrez une **pull request**.  
 
 ---
-
-## 📄 Licence  
-
-Ce projet est sous licence MIT. Consultez le fichier [LICENSE](./LICENSE) pour plus de détails.  
-
----
-
-**Merci d'utiliser le Jeu de la Vie ! Amusez-vous bien avec cette simulation captivante. 🌟**
-
 
   
 
