@@ -22,7 +22,7 @@ Un projet de simulation du célèbre **Jeu de la Vie** de John Conway, implémen
 7. [Diagramme UML](#-diagramme-uml)  
 8. [Tests Unitaires](#-tests-unitaires)  
 9. [Contributions](#-contributions)  
-10. [Licence](#-licence)  
+  
 
 ---
 
@@ -48,9 +48,68 @@ Ce projet propose :
 - Affiche la grille à chaque génération dans le terminal.  
 - Simplicité et rapidité d'exécution.  
 
-#### Mode Graphique  
-- Interface visuelle élégante avec **SFML**.  
-- Contrôle interactif de la vitesse via le clavier (`+` et `-`).  
+
+## 🚀 **Démarrer le Mode Graphique**
+1. Lancez l'application et accédez au **menu principal**.
+2. Sélectionnez **START** pour commencer une nouvelle simulation.
+3. Besoin d'aide ? Cliquez sur **TUTORIAL** pour un guide détaillé.
+
+---
+
+## 🎨 **Interface Graphique**
+
+### 📊 **Grille de Simulation**
+- Chaque case de la grille représente une **cellule vivante ou morte**.
+- Les cellules évoluent automatiquement au fil des itérations.
+
+### 🔧 **Panneau de Contrôle**
+En haut de l'écran, retrouvez des options pour configurer et interagir avec la simulation :
+- 🌀 **Oscillateur (Press O)** : Charge un motif oscillant.
+- ✈️ **Planeur (Press P)** : Charge un planeur en mouvement.
+- 💥 **Canon (Press C)** : Active un canon de planeurs.
+- 🔄 **Réinitialisation** : Efface la grille et redémarre la simulation.
+- ⏱️ **Nombre d'itérations** : Indique le nombre de cycles effectués.
+- 👥 **Population actuelle** : Affiche le nombre de cellules vivantes.
+- ⚡ **Commandes de vitesse** : Ajustez la vitesse d'évolution (plus lent ou plus rapide).
+
+---
+
+## 🎮 **Commandes**
+### 🎹 **Clavier** :
+- **O** : Charger un oscillateur.
+- **P** : Charger un planeur.
+- **C** : Charger un canon.
+- **R** : Réinitialiser la grille.
+
+### 🖱️ **Souris** :
+- **Clic gauche** : Activer ou désactiver une cellule.
+- **Maintien du clic** : Dessiner plusieurs cellules à la fois.
+
+---
+
+## 🌈 **Personnalisation**
+- Rendez le jeu encore plus amusant en modifiant son apparence !
+  - Accédez au menu **THEME** pour changer les couleurs et styles (par exemple : mode clair 🌞 ou sombre 🌑).
+
+---
+
+## 🛑 **Quitter le Jeu**
+- Cliquez sur **EXIT** depuis le menu principal ou fermez directement la fenêtre.
+
+---
+
+## 💡 **Astuces pour bien commencer**
+- Essayez les motifs préchargés pour découvrir les comportements dynamiques fascinants :
+  - 🌀 **Oscillateurs**
+  - ✈️ **Planeurs**
+  - 💥 **Canons**
+- Créez vos propres motifs directement dans la grille et observez leur évolution !
+
+---
+
+---
+
+🌟 **Explorez, créez et amusez-vous !** 🌟
 
 ### 2️⃣ Grille torique  
 - Les cellules en bord de grille sont connectées avec celles du côté opposé, créant une grille "circulaire". 🌐  
