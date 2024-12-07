@@ -382,32 +382,51 @@ void SFMLInterface::afficherThemeMenu() {
     float startY = window.getSize().y / 3;
     float spacing = 80.0f;
 
-    // Titre
+    // Titre avec effet de bordure
     sf::Text titreTheme;
     titreTheme.setFont(font);
     titreTheme.setString("SELECTION THEME");
-    titreTheme.setCharacterSize(40);
-    titreTheme.setFillColor(sf::Color::White);
-    titreTheme.setPosition(
-        centreX - titreTheme.getLocalBounds().width / 2,
+    titreTheme.setCharacterSize(50);
+
+    // Effet de bordure
+    sf::Text titreBordure = titreTheme;
+    titreBordure.setFillColor(sf::Color(0, 157, 255));
+    titreBordure.setOutlineThickness(2);
+    titreBordure.setOutlineColor(sf::Color::White);
+    titreBordure.setPosition(
+        centreX - titreBordure.getLocalBounds().width / 2,
         startY - 100
     );
-    window.draw(titreTheme);
+    window.draw(titreBordure);
 
-    // Options de musique
+    // Options de musique avec cadres
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-    // Affichage des musiques
+    // Affichage des musiques avec cadres stylisés
     for (size_t i = 0; i < musicNames.size(); i++) {
+        // Cadre de l'option
+        sf::RectangleShape cadre;
+        float cadreWidth = 300.0f;
+        float cadreHeight = 50.0f;
+        cadre.setSize(sf::Vector2f(cadreWidth, cadreHeight));
+        cadre.setPosition(
+            centreX - cadreWidth / 2,
+            startY + i * spacing - 10
+        );
+        cadre.setFillColor(sf::Color(20, 20, 40, 200));
+        cadre.setOutlineThickness(2);
+
         sf::Text musicOption;
         musicOption.setFont(font);
         musicOption.setString(musicNames[i]);
         musicOption.setCharacterSize(30);
 
         if (i == selectedMusic) {
+            cadre.setOutlineColor(sf::Color(0, 255, 255));
             musicOption.setFillColor(sf::Color(0, 255, 255));
         }
         else {
+            cadre.setOutlineColor(sf::Color(100, 100, 100));
             musicOption.setFillColor(sf::Color::White);
         }
 
@@ -416,37 +435,61 @@ void SFMLInterface::afficherThemeMenu() {
             startY + i * spacing
         );
 
-        if (musicOption.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+        if (cadre.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            cadre.setFillColor(sf::Color(40, 40, 60, 200));
             musicOption.setFillColor(sf::Color(0, 255, 255));
         }
 
+        window.draw(cadre);
         window.draw(musicOption);
     }
 
     // Affichage des thèmes de couleur
     float themeStartY = startY + (musicNames.size() + 1) * spacing;
 
+    // Séparateur
+    sf::RectangleShape separator(sf::Vector2f(400.f, 2.f));
+    separator.setPosition(centreX - 200.f, themeStartY - spacing / 2);
+    separator.setFillColor(sf::Color(100, 100, 100));
+    window.draw(separator);
+
     for (size_t i = 0; i < themeNames.size(); i++) {
+        // Cadre du thème
+        sf::RectangleShape themeCadre;
+        float cadreWidth = 300.0f;
+        float cadreHeight = 50.0f;
+        themeCadre.setSize(sf::Vector2f(cadreWidth, cadreHeight));
+        themeCadre.setPosition(
+            centreX - cadreWidth / 2,
+            themeStartY + i * spacing - 10
+        );
+        themeCadre.setFillColor(sf::Color(20, 20, 40, 200));
+        themeCadre.setOutlineThickness(2);
+
         sf::Text themeOption;
         themeOption.setFont(font);
         themeOption.setString(themeNames[i]);
         themeOption.setCharacterSize(30);
 
-        // Couleur selon le thème
+        // Couleur selon le thème sélectionné
         if (i == static_cast<int>(currentTheme)) {
             switch (currentTheme) {
             case ColorTheme::BLUE:
+                themeCadre.setOutlineColor(sf::Color(0, 157, 255));
                 themeOption.setFillColor(sf::Color(0, 157, 255));
                 break;
             case ColorTheme::GREEN:
+                themeCadre.setOutlineColor(sf::Color(0, 255, 50));
                 themeOption.setFillColor(sf::Color(0, 255, 50));
                 break;
             case ColorTheme::RED:
+                themeCadre.setOutlineColor(sf::Color(255, 0, 31));
                 themeOption.setFillColor(sf::Color(255, 0, 31));
                 break;
             }
         }
         else {
+            themeCadre.setOutlineColor(sf::Color(100, 100, 100));
             themeOption.setFillColor(sf::Color::White);
         }
 
@@ -455,14 +498,28 @@ void SFMLInterface::afficherThemeMenu() {
             themeStartY + i * spacing
         );
 
-        if (themeOption.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+        if (themeCadre.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            themeCadre.setFillColor(sf::Color(40, 40, 60, 200));
             themeOption.setFillColor(sf::Color(0, 255, 255));
         }
 
+        window.draw(themeCadre);
         window.draw(themeOption);
     }
 
-    // Bouton retour
+    // Bouton retour stylisé
+    sf::RectangleShape retourCadre;
+    float retourWidth = 200.0f;
+    float retourHeight = 40.0f;
+    retourCadre.setSize(sf::Vector2f(retourWidth, retourHeight));
+    retourCadre.setPosition(
+        centreX - retourWidth / 2,
+        themeStartY + themeNames.size() * spacing + 45
+    );
+    retourCadre.setFillColor(sf::Color(20, 20, 40, 200));
+    retourCadre.setOutlineThickness(2);
+    retourCadre.setOutlineColor(sf::Color(100, 100, 100));
+
     sf::Text retourTexte;
     retourTexte.setFont(font);
     retourTexte.setString("RETOUR");
@@ -473,10 +530,12 @@ void SFMLInterface::afficherThemeMenu() {
         themeStartY + themeNames.size() * spacing + 50
     );
 
-    if (retourTexte.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+    if (retourCadre.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+        retourCadre.setFillColor(sf::Color(40, 40, 60, 200));
         retourTexte.setFillColor(sf::Color(0, 255, 255));
     }
 
+    window.draw(retourCadre);
     window.draw(retourTexte);
     window.display();
 }
@@ -489,11 +548,13 @@ void SFMLInterface::afficherMenu() {
 
     window.clear(sf::Color(11, 13, 30));
 
+    // Afficher le titre
     window.draw(titreTexte);
     window.draw(triskelionSprite);
+
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-    // Gestion du survol pour les textes directement (sans les rectangles verts)
+    // Gestion du survol pour les textes
     auto gererSurvol = [&](sf::Text& texte) {
         if (texte.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             texte.setFillColor(sf::Color(0, 255, 255));  // Cyan au survol
@@ -509,12 +570,11 @@ void SFMLInterface::afficherMenu() {
     gererSurvol(tutorialTexte);
     gererSurvol(exitTexte);
 
-    // Affichage des textes uniquement (sans les rectangles)
+    // Affichage des textes
     window.draw(startTexte);
     window.draw(paramsTexte);
     window.draw(tutorialTexte);
     window.draw(exitTexte);
-    window.draw(musicTexte);
 
     window.display();
 }
