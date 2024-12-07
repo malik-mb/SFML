@@ -16,6 +16,15 @@ private:
     sf::Text paramsTexte;
     sf::Text tutorialTexte;
     sf::Text exitTexte;
+    sf::Text oscillateurTexte;
+    sf::Text planeurTexte;
+    sf::Text canonTexte;
+    sf::Text oscillateurNom;
+    sf::Text planeurNom;
+    sf::Text canonNom;
+    sf::Text populationTexte;
+    sf::Text generationTexte;
+
     sf::RectangleShape boutonStart;
     sf::RectangleShape boutonParams;
     sf::RectangleShape boutonTutorial;
@@ -54,40 +63,38 @@ private:
     sf::RectangleShape speedBar;
     sf::RectangleShape speedSlider;
 
+    sf::Music menuMusic;
+    bool musicPlaying;
     float volume;
     bool isMuted;
     float currentSpeed;
 
-    sf::Text oscillateurTexte;
-    sf::Text planeurTexte;
-    sf::Text canonTexte;
-
-    sf::Music menuMusic;
-
     int tailleCellule;
     bool enPleinEcran;
-    bool musicPlaying;
     bool estEnTrainDeModifier;
     sf::Vector2i derniereCelluleModifiee;
-
+    static int generation;
+    int nombreIterations;  // Variable pour stocker
     std::stack<std::vector<std::vector<bool>>> undoStack;
     std::stack<std::vector<std::vector<bool>>> redoStack;
 
-    const float BANDE_NOIRE_HAUTEUR = 100.0f;
-
-    void ajouterPattern(Grille& grille, const std::vector<std::pair<int, int>>& coords, int ligneBase, int colonneBase);
-    void ajouterPlaneur(Grille& grille, int ligneBase, int colonneBase);
-    void ajouterCanon(Grille& grille, int ligneBase, int colonneBase);
-    void ajouterOscillateur(Grille& grille, int ligneBase, int colonneBase);
-    void resetGrille(Grille& grille);
+    static const int BANDE_NOIRE_HAUTEUR = 100;
+     static int nombreMisesAJour;  // Pour compter les mises à jour
     void updateVolumeSlider();
     void updateSpeedSlider();
     void handleVolumeControl(const sf::Vector2i& mousePos);
     void handleSpeedControl(const sf::Vector2i& mousePos, int& vitesseSimulation);
+    void ajouterPattern(Grille& grille, const std::vector<std::pair<int, int>>& coords, int ligneBase, int colonneBase);
+    void resetGrille(Grille& grille);
+    void ajouterPlaneur(Grille& grille, int ligneBase, int colonneBase);
+    void ajouterCanon(Grille& grille, int ligneBase, int colonneBase);
+    void ajouterOscillateur(Grille& grille, int ligneBase, int colonneBase);
+    void resetGeneration();
 
 public:
     bool enMenu;
-
+    void setNombreIterations(int n) { nombreIterations = n; }
+    void resetNombreIterations() { nombreIterations = 0; }
     SFMLInterface(int largeur, int hauteur, int tailleCellule);
     void afficherGrille(const Grille& grille, bool enPause);
     void afficherMenu();
@@ -103,4 +110,7 @@ public:
     std::vector<std::vector<bool>> captureEtatGrille(const Grille& grille);
     void appliquerEtatGrille(Grille& grille, const std::vector<std::vector<bool>>& etat);
     void toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos);
+    void incrementerMisesAJour();
+    void resetMisesAJour();
+
 };

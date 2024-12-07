@@ -24,6 +24,18 @@ public:
     void sauvegarderDansFichier(const std::string& chemin) const;
     void calculerProchaineIteration();
     void afficherEtat() const;
+    void miseAJour() {
+        // Sauvegarder l'état précédent pour la détection de stabilité
+        etatPrecedent.clear();
+        etatPrecedent.resize(nbLignes, std::vector<bool>(nbColonnes));
+        for (int i = 0; i < nbLignes; ++i) {
+            for (int j = 0; j < nbColonnes; ++j) {
+                etatPrecedent[i][j] = cellules[i][j].estVivante();
+            }
+        }
+
+        calculerProchaineIteration();
+    }
 };
 
 #endif // GRILLE_H

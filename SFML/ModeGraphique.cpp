@@ -10,7 +10,7 @@ void ModeGraphique::lancerSimulation() {
     sf::Clock clock;
 
     while (interface->estOuverte()) {
-        if (interface->enMenu) {  // Modification ici : accès direct au membre public
+        if (interface->enMenu) {
             interface->afficherMenu();
             interface->attendreEvenements(vitesseSimulation, enPause, grille);
             continue;
@@ -25,6 +25,7 @@ void ModeGraphique::lancerSimulation() {
 
         if (clock.getElapsedTime().asMilliseconds() >= vitesseSimulation) {
             grille.calculerProchaineIteration();
+            interface->incrementerMisesAJour();  // Incrémenter le compteur
             clock.restart();
         }
     }
