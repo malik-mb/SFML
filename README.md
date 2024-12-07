@@ -163,7 +163,9 @@ Pour initialiser la grille, fournissez un fichier d'entrée au format suivant :
 
 Voici un diagramme UML des cas d'utilisation pour le projet :  
 
-![Diagramme UML](attachment://Capture-d'écran-2024-11-28-204742.png)  
+![diagramme cas d'utilisation ]![Capture d'écran 2024-11-28 204742](https://github.com/user-attachments/assets/6eadf8bc-53b2-4cf6-aae4-f646f08c8d1e)
+()
+  
 
 ---
 
