@@ -119,4 +119,5 @@ void Grille::afficherEtat() const {
         }
         std::cout << "\n";
     }
+
 }

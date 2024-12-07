@@ -35,7 +35,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
 
     window.create(sf::VideoMode::getDesktopMode(), "Game Of Life", sf::Style::Fullscreen);
     celluleShape.setSize(sf::Vector2f(tailleCellule - 1, tailleCellule - 1));
-    if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
+    if (!font.loadFromFile("C:\\Users\\malik\\Downloads\\Bungee-Regular.ttf")) {
         std::cerr << "Erreur : Impossible de charger la police." << std::endl;
     }
 
@@ -916,37 +916,430 @@ void SFMLInterface::afficherMenu() {
 
     window.clear(sf::Color(11, 13, 30));
 
-    // Afficher le titre
-    window.draw(titreTexte);
-    window.draw(triskelionSprite);
+    // Fonction helper pour les décorations latérales
+    auto drawSideDecoration = [this](float x, float y, bool isLeft) {
+        // Ligne verticale principale
+        sf::RectangleShape mainLine(sf::Vector2f(2.f, 600.f));
+        mainLine.setPosition(x, y);
+        mainLine.setFillColor(sf::Color(0, 157, 255, 100));
+        window.draw(mainLine);
 
-    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        // Plusieurs colonnes de décorations
+        for (int col = 0; col < 3; col++) {
+            float xOffset = isLeft ? (col * 40.f) : (-col * 40.f - 40.f);
 
-    // Gestion du survol pour les textes
-    auto gererSurvol = [&](sf::Text& texte) {
-        if (texte.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-            texte.setFillColor(sf::Color(0, 255, 255));  // Cyan au survol
+            // Lignes horizontales
+            for (int i = 0; i < 10; i++) {
+                sf::RectangleShape hLine(sf::Vector2f(30.f, 2.f));
+                float yOffset = i * 65.f;
+                hLine.setPosition(x + xOffset, y + yOffset);
+                hLine.setFillColor(sf::Color(0, 157, 255, 100));
+                window.draw(hLine);
+
+                // Points décoratifs
+                sf::CircleShape point(2.f);
+                point.setFillColor(sf::Color(0, 255, 255, 150));
+                point.setPosition(
+                    x + xOffset + (isLeft ? 30.f : -4.f),
+                    y + yOffset - 2.f
+                );
+                window.draw(point);
+
+                // Rectangles décoratifs
+                if (i % 2 == 0) {
+                    sf::RectangleShape rect(sf::Vector2f(15.f, 8.f));
+                    rect.setPosition(
+                        x + xOffset + (isLeft ? 35.f : -20.f),
+                        y + yOffset - 3.f
+                    );
+                    rect.setFillColor(sf::Color(0, 157, 255, 50));
+                    window.draw(rect);
+                }
+            }
+
+            // Lignes verticales secondaires
+            sf::RectangleShape vLine(sf::Vector2f(2.f, 580.f));
+            vLine.setPosition(x + xOffset + (isLeft ? 30.f : 0.f), y + 10.f);
+            vLine.setFillColor(sf::Color(0, 157, 255, 70));
+            window.draw(vLine);
+
+            // Hexagones décoratifs
+            for (int i = 0; i < 5; i++) {
+                sf::CircleShape hexagon(10.f, 6);
+                hexagon.setPosition(
+                    x + xOffset + (isLeft ? 10.f : -20.f),
+                    y + i * 140.f + 20.f
+                );
+                hexagon.setFillColor(sf::Color(0, 0, 0, 0));
+                hexagon.setOutlineColor(sf::Color(0, 157, 255, 100));
+                hexagon.setOutlineThickness(1.f);
+                hexagon.setRotation(30.f);
+                window.draw(hexagon);
+            }
         }
-        else {
-            texte.setFillColor(sf::Color::White);  // Blanc par défaut
+        // Motifs triangulaires
+        for (int i = 0; i < 8; i++) {
+            sf::ConvexShape triangle;
+            triangle.setPointCount(3);
+            float size = 15.f;
+            triangle.setPoint(0, sf::Vector2f(0, 0));
+            triangle.setPoint(1, sf::Vector2f(size, size / 2));
+            triangle.setPoint(2, sf::Vector2f(0, size));
+
+            triangle.setPosition(
+                x + (isLeft ? 120.f : -140.f),
+                y + i * 80.f + 20.f
+            );
+            triangle.setFillColor(sf::Color(0, 157, 255, 50));
+            triangle.setRotation(isLeft ? 0.f : 180.f);
+            window.draw(triangle);
+        }
+
+        // Cercles pulsants
+        static float pulse = 0.0f;
+        pulse += 0.05f;
+        for (int i = 0; i < 4; i++) {
+            float radius = 8.f + std::sin(pulse + i) * 2.f;
+            sf::CircleShape circle(radius);
+            circle.setPosition(
+                x + (isLeft ? 140.f : -160.f),
+                y + i * 160.f + 40.f
+            );
+            circle.setFillColor(sf::Color(0, 157, 255, 30));
+            circle.setOutlineColor(sf::Color(0, 255, 255, 100));
+            circle.setOutlineThickness(1.f);
+            window.draw(circle);
+        }
+
+        // Lignes diagonales
+        for (int i = 0; i < 15; i++) {
+            sf::RectangleShape diagLine(sf::Vector2f(20.f, 1.f));
+            diagLine.setPosition(
+                x + (isLeft ? 90.f : -110.f),
+                y + i * 40.f + 10.f
+            );
+            diagLine.setRotation(isLeft ? 45.f : -45.f);
+            diagLine.setFillColor(sf::Color(0, 157, 255, 70));
+            window.draw(diagLine);
         }
         };
 
-    // Application du survol sur chaque texte
-    gererSurvol(startTexte);
-    gererSurvol(paramsTexte);
-    gererSurvol(tutorialTexte);
-    gererSurvol(exitTexte);
+    // Effet de nébuleuse en arrière-plan
+    static std::vector<sf::CircleShape> nebulaPoints;
+    static std::vector<float> nebulaPhases;
+    if (nebulaPoints.empty()) {
+        for (int i = 0; i < 200; i++) {
+            sf::CircleShape point(rand() % 3 + 1);
+            point.setPosition(
+                rand() % window.getSize().x,
+                rand() % window.getSize().y
+            );
+            point.setFillColor(sf::Color(
+                0,
+                rand() % 100 + 157,
+                rand() % 100 + 155,
+                rand() % 100 + 50
+            ));
+            nebulaPoints.push_back(point);
+            nebulaPhases.push_back(static_cast<float>(rand()) / RAND_MAX * 6.28f);
+        }
+    }
 
-    // Affichage des textes
-    window.draw(startTexte);
-    window.draw(paramsTexte);
-    window.draw(tutorialTexte);
-    window.draw(exitTexte);
+    // Animation de la nébuleuse
+    static float nebulaTime = 0.0f;
+    nebulaTime += 0.01f;
+    for (size_t i = 0; i < nebulaPoints.size(); i++) {
+        nebulaPhases[i] += 0.01f;
+        float xOffset = std::sin(nebulaPhases[i]) * 2;
+        float yOffset = std::cos(nebulaPhases[i]) * 2;
+        nebulaPoints[i].move(xOffset, yOffset);
+
+        float scale = 1.0f + std::sin(nebulaTime + nebulaPhases[i]) * 0.2f;
+        nebulaPoints[i].setScale(scale, scale);
+
+        sf::Color color = nebulaPoints[i].getFillColor();
+        color.a = static_cast<sf::Uint8>(100 + 50 * std::sin(nebulaTime + nebulaPhases[i]));
+        nebulaPoints[i].setFillColor(color);
+
+        window.draw(nebulaPoints[i]);
+    }
+    // Effet de grille en arrière-plan avec ondulation
+    static float gridOffset = 0.0f;
+    static float waveTime = 0.0f;
+    gridOffset += 0.5f;
+    waveTime += 0.02f;
+
+    for (float x = -100; x < window.getSize().x + 100; x += 50) {
+        for (float y = -100; y < window.getSize().y + 100; y += 50) {
+            sf::RectangleShape gridPoint(sf::Vector2f(2, 2));
+            float waveOffset = std::sin(waveTime + x * 0.01f) * 20;
+            float xPos = x + std::sin((y + gridOffset) * 0.02f) * 10 + waveOffset;
+            gridPoint.setPosition(xPos, y);
+            gridPoint.setFillColor(sf::Color(0, 157, 255, 20));
+            window.draw(gridPoint);
+        }
+    }
+
+    // Effet de lignes énergétiques
+    static std::vector<sf::VertexArray> energyLines;
+    static std::vector<float> linePhases;
+    if (energyLines.empty()) {
+        for (int i = 0; i < 10; i++) {
+            sf::VertexArray line(sf::Lines, 2);
+            line[0].position = sf::Vector2f(0, rand() % window.getSize().y);
+            line[1].position = sf::Vector2f(window.getSize().x, rand() % window.getSize().y);
+            line[0].color = sf::Color(0, 157, 255, 50);
+            line[1].color = sf::Color(0, 157, 255, 50);
+            energyLines.push_back(line);
+            linePhases.push_back(static_cast<float>(rand()) / RAND_MAX * 6.28f);
+        }
+    }
+
+    // Animation des lignes énergétiques
+    static float lineTime = 0.0f;
+    lineTime += 0.02f;
+    for (size_t i = 0; i < energyLines.size(); i++) {
+        linePhases[i] += 0.01f;
+        float yOffset = std::sin(lineTime + linePhases[i]) * 50;
+        energyLines[i][0].position.y = energyLines[i][0].position.y + yOffset;
+        energyLines[i][1].position.y = energyLines[i][1].position.y + yOffset;
+
+        sf::Uint8 alpha = static_cast<sf::Uint8>(30 + 20 * std::sin(lineTime + linePhases[i]));
+        energyLines[i][0].color.a = alpha;
+        energyLines[i][1].color.a = alpha;
+
+        window.draw(energyLines[i]);
+    }
+
+    // Cercles décoratifs animés
+    static std::vector<sf::CircleShape> decorativeCircles;
+    static std::vector<float> circlePhases;
+    if (decorativeCircles.empty()) {
+        for (int i = 0; i < 3; i++) {
+            sf::CircleShape circle(100.f);
+            circle.setFillColor(sf::Color::Transparent);
+            circle.setOutlineThickness(2.f);
+            circle.setPosition(window.getSize().x * 0.2f * (i + 1), -50.f);
+            decorativeCircles.push_back(circle);
+            circlePhases.push_back(static_cast<float>(rand()) / RAND_MAX * 6.28f);
+        }
+    }
+
+    // Animation des cercles
+    for (size_t i = 0; i < decorativeCircles.size(); i++) {
+        circlePhases[i] += 0.02f;
+        float alpha = (std::sin(circlePhases[i]) + 1.f) / 2.f * 100.f;
+        decorativeCircles[i].setOutlineColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(alpha)));
+        decorativeCircles[i].setRotation(circlePhases[i] * 30);
+        window.draw(decorativeCircles[i]);
+    }
+    // Animation du titre avec effets
+    static float titlePulse = 0.0f;
+    static float titleDistortionTime = 0.0f;
+    titlePulse += 0.05f;
+    titleDistortionTime += 0.05f;
+    float scale = 1.0f + std::sin(titlePulse) * 0.02f;
+
+    // Mise à jour de la taille des textes
+    titreTexte.setCharacterSize(60);
+    startTexte.setCharacterSize(40);
+    paramsTexte.setCharacterSize(40);
+    tutorialTexte.setCharacterSize(40);
+    exitTexte.setCharacterSize(40);
+
+    // Effet de chromatic aberration pour le titre
+    sf::Text titreRed = titreTexte;
+    sf::Text titreBlue = titreTexte;
+    float distortionAmount = std::sin(titleDistortionTime) * 3.0f;
+    titreRed.setPosition(titreTexte.getPosition() + sf::Vector2f(distortionAmount, 0));
+    titreBlue.setPosition(titreTexte.getPosition() - sf::Vector2f(distortionAmount, 0));
+    titreRed.setFillColor(sf::Color(255, 0, 0, 100));
+    titreBlue.setFillColor(sf::Color(0, 0, 255, 100));
+
+    // Effet de glitch pour le titre
+    titreTexte.setCharacterSize(60);
+    titreTexte.setFillColor(sf::Color(0, 157, 255)); // Couleur cyan/bleu fixe
+
+    // Simple ombre pour la profondeur
+    sf::Text titreShadow = titreTexte;
+    titreShadow.setPosition(titreTexte.getPosition() + sf::Vector2f(4, 4));
+    titreShadow.setFillColor(sf::Color(0, 0, 0, 150));
+
+    // Rendu du titre
+    window.draw(titreShadow);
+    window.draw(titreTexte);
+
+    window.draw(titreShadow);
+    window.draw(titreRed);
+    window.draw(titreBlue);
+    titreTexte.setScale(scale, scale);
+    window.draw(titreTexte);
+
+    // Gestion des boutons du menu avec effets améliorés
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    std::vector<sf::Text*> menuTexts = { &startTexte, &paramsTexte, &tutorialTexte, &exitTexte };
+    static std::vector<float> buttonPulses(menuTexts.size(), 0.0f);
+    static std::vector<bool> buttonHovered(menuTexts.size(), false);
+
+    // Barres stylisées entre les boutons
+    static float barPulse = 0.0f;
+    barPulse += 0.05f;
+
+    for (size_t i = 0; i < menuTexts.size() - 1; i++) {
+        sf::RectangleShape decorativeLine(sf::Vector2f(400.f, 2.f));
+        float yPos = (menuTexts[i]->getPosition().y + menuTexts[i + 1]->getPosition().y) / 2.f;
+
+        decorativeLine.setPosition(
+            window.getSize().x / 2.f - 200.f + std::sin(barPulse + i) * 10.f,
+            yPos
+        );
+
+        float gradientPos = std::fmod(barPulse + i * 0.5f, 1.0f);
+        sf::Color lineColor(0, 157, 255, static_cast<sf::Uint8>(100 + 50 * std::sin(barPulse + i)));
+        decorativeLine.setFillColor(lineColor);
+
+        window.draw(decorativeLine);
+
+        // Points décoratifs aux extrémités
+        sf::CircleShape endPoint(2.f);
+        endPoint.setFillColor(lineColor);
+        endPoint.setPosition(decorativeLine.getPosition().x - 2.f, yPos - 2.f);
+        window.draw(endPoint);
+        endPoint.setPosition(
+            decorativeLine.getPosition().x + decorativeLine.getSize().x - 2.f,
+            yPos - 2.f
+        );
+        window.draw(endPoint);
+    }
+
+    // Décorations latérales
+    float sideOffset = 80.f;
+    drawSideDecoration(sideOffset, window.getSize().y / 2.f - 300.f, true);
+    drawSideDecoration(window.getSize().x - sideOffset, window.getSize().y / 2.f - 300.f, false);
+    // Rendu des boutons avec effets de survol
+    for (size_t i = 0; i < menuTexts.size(); i++) {
+        sf::Text* text = menuTexts[i];
+        bool isHovered = text->getGlobalBounds().contains(mousePos.x, mousePos.y);
+
+        buttonPulses[i] += isHovered ? 0.1f : -0.1f;
+        buttonPulses[i] = std::max(0.0f, std::min(1.0f, buttonPulses[i]));
+        float hoverScale = 1.0f + buttonPulses[i] * 0.1f;
+        text->setScale(hoverScale, hoverScale);
+
+        if (isHovered) {
+            text->setFillColor(sf::Color(0, 255, 255));
+
+            // Particules autour du bouton survolé
+            if (rand() % 3 == 0) {
+                for (int j = 0; j < 2; j++) {
+                    sf::CircleShape sparkle(1.f);
+                    sparkle.setPosition(
+                        text->getGlobalBounds().left + rand() % static_cast<int>(text->getGlobalBounds().width),
+                        text->getGlobalBounds().top + rand() % static_cast<int>(text->getGlobalBounds().height)
+                    );
+                    sparkle.setFillColor(sf::Color(0, 255, 255, 150));
+                    window.draw(sparkle);
+                }
+            }
+        }
+        else {
+            text->setFillColor(sf::Color::White);
+        }
+
+        // Ombre du texte
+        sf::Text shadowText = *text;
+        shadowText.setPosition(text->getPosition() + sf::Vector2f(2, 2));
+        shadowText.setFillColor(sf::Color(0, 0, 0, 100));
+        window.draw(shadowText);
+        window.draw(*text);
+    }
+
+    // Décorations des coins
+    for (int i = 0; i < 2; i++) {
+        float xPos = i == 0 ? 0.f : window.getSize().x - 200.f;
+        sf::RectangleShape cornerDeco(sf::Vector2f(200.f, 100.f));
+        cornerDeco.setPosition(xPos, 0);
+        cornerDeco.setFillColor(sf::Color(0, 0, 0, 0));
+        cornerDeco.setOutlineColor(sf::Color(0, 157, 255, 70));
+        cornerDeco.setOutlineThickness(1.f);
+        window.draw(cornerDeco);
+
+        // Version en bas
+        cornerDeco.setPosition(xPos, window.getSize().y - 100.f);
+        window.draw(cornerDeco);
+    }
+
+    // Signature avec effets
+    static float signaturePulse = 0.0f;
+    signaturePulse += 0.03f;
+
+    sf::Text signature;
+    signature.setFont(font);
+    signature.setString("Created by Darwizzyy");
+    signature.setCharacterSize(24);
+    signature.setPosition(
+        window.getSize().x - signature.getLocalBounds().width - 30.f,
+        window.getSize().y - signature.getLocalBounds().height - 20.f
+    );
+
+    float signatureAlpha = 128 + 127 * std::sin(signaturePulse);
+    signature.setFillColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(signatureAlpha)));
+
+    // Cadre décoratif pour la signature
+    sf::RectangleShape signatureFrame;
+    signatureFrame.setSize(sf::Vector2f(
+        signature.getLocalBounds().width + 40.f,
+        signature.getLocalBounds().height + 20.f
+    ));
+    signatureFrame.setPosition(
+        signature.getPosition().x - 20.f,
+        signature.getPosition().y - 10.f
+    );
+    signatureFrame.setFillColor(sf::Color(0, 0, 0, 50));
+    signatureFrame.setOutlineColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(signatureAlpha)));
+    signatureFrame.setOutlineThickness(1.f);
+
+    window.draw(signatureFrame);
+    window.draw(signature);
+
+    // Effets finaux
+    // Effet de glitch aléatoire
+    if (rand() % 200 == 0) {
+        sf::RectangleShape glitchLine(sf::Vector2f(window.getSize().x, rand() % 5 + 1));
+        glitchLine.setPosition(0, rand() % window.getSize().y);
+        glitchLine.setFillColor(sf::Color(255, 255, 255, 50));
+        window.draw(glitchLine);
+    }
+
+    // Scan-lines
+    for (int y = 0; y < window.getSize().y; y += 4) {
+        sf::RectangleShape scanLine(sf::Vector2f(window.getSize().x, 1));
+        scanLine.setPosition(0, y);
+        scanLine.setFillColor(sf::Color(255, 255, 255, 3));
+        window.draw(scanLine);
+    }
+
+    // Effet de vignette dynamique
+    static float screenDistortionTime = 0.0f;
+    screenDistortionTime += 0.01f;
+    sf::RectangleShape vignetteCorners[4];
+    for (int i = 0; i < 4; i++) {
+        vignetteCorners[i].setSize(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+        float alpha = 100 + 50 * std::sin(screenDistortionTime);
+        vignetteCorners[i].setFillColor(sf::Color(0, 0, 20, static_cast<sf::Uint8>(alpha)));
+    }
+
+    vignetteCorners[0].setPosition(0, 0);
+    vignetteCorners[1].setPosition(window.getSize().x / 2.f, 0);
+    vignetteCorners[2].setPosition(0, window.getSize().y / 2.f);
+    vignetteCorners[3].setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f);
+
+    for (auto& corner : vignetteCorners) {
+        window.draw(corner);
+    }
 
     window.display();
 }
-
 void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.clear(sf::Color(50, 50, 50));
 
@@ -1224,7 +1617,87 @@ void SFMLInterface::appliquerEtatGrille(Grille& grille, const std::vector<std::v
         }
     }
 }
+void SFMLInterface::afficherTutorial() {
+    window.clear(sf::Color(11, 13, 30));
 
+    float centreX = window.getSize().x / 2;
+    float startY = 100.0f;
+    float spacing = 40.0f;
+
+    std::vector<std::pair<std::string, std::string>> controls = {
+        {"Souris gauche", "Dessiner/Effacer des cellules"},
+        {"Espace", "Pause/Reprendre la simulation"},
+        {"R", "Réinitialiser la grille"},
+        {"P", "Placer un planeur à la position du curseur"},
+        {"O", "Placer un oscillateur à la position du curseur"},
+        {"C", "Placer un canon à la position du curseur"},
+        {"Ctrl + Z", "Annuler la dernière action"},
+        {"Ctrl + Y", "Rétablir la dernière action"},
+        {"M", "Activer/Désactiver la musique"},
+        {"Flèches gauche/droite", "Ajuster la vitesse"},
+        {"Echap", "Retourner au menu"}
+    };
+
+    // Titre
+    sf::Text titreTexte;
+    titreTexte.setFont(font);
+    titreTexte.setString("TUTORIEL");
+    titreTexte.setCharacterSize(50);
+    titreTexte.setFillColor(sf::Color::White);
+    titreTexte.setPosition(
+        centreX - titreTexte.getLocalBounds().width / 2,
+        startY - 50
+    );
+    window.draw(titreTexte);
+
+    // Afficher les contrôles
+    for (size_t i = 0; i < controls.size(); i++) {
+        // Touche
+        sf::Text keyText;
+        keyText.setFont(font);
+        keyText.setString(controls[i].first);
+        keyText.setCharacterSize(25);
+        keyText.setFillColor(sf::Color(0, 157, 255));
+        keyText.setPosition(
+            centreX - 300,
+            startY + i * spacing
+        );
+
+        // Description
+        sf::Text descText;
+        descText.setFont(font);
+        descText.setString(controls[i].second);
+        descText.setCharacterSize(25);
+        descText.setFillColor(sf::Color::White);
+        descText.setPosition(
+            centreX - 50,
+            startY + i * spacing
+        );
+
+        window.draw(keyText);
+        window.draw(descText);
+    }
+
+    // Bouton retour
+    sf::Text retourTexte;
+    retourTexte.setFont(font);
+    retourTexte.setString("RETOUR");
+    retourTexte.setCharacterSize(30);
+    retourTexte.setFillColor(sf::Color::White);
+    retourTexte.setPosition(
+        centreX - retourTexte.getLocalBounds().width / 2,
+        startY + controls.size() * spacing + 50
+    );
+
+    // Effet de survol pour le bouton retour
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    if (retourTexte.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+        retourTexte.setFillColor(sf::Color(0, 255, 255));
+    }
+
+    window.draw(retourTexte);
+    window.display();
+}
 void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Grille& grille) {
     static bool isDraggingVolume = false;
     static bool isDraggingSpeed = false;

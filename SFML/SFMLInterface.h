@@ -29,6 +29,21 @@ private:
     static int nombreMisesAJour;
     std::vector<sf::CircleShape> particles;  // Pour l'effet de particules
     float pulseTimer;  // Pour l'effet de pulsation
+    bool enTutorial = false;
+    struct MenuButton {
+        sf::Text* text;
+        std::string label;
+    };
+
+    // Variables pour la saisie d'itérations
+    bool demandeIterations = false;
+    std::string inputIterations;
+    sf::Text iterationsTexte;
+    sf::Text skipTexte;
+    sf::RectangleShape inputBox;
+    sf::RectangleShape skipButton;
+    int nombreIterationsMax = -1;
+
     // Vecteurs pour la gestion des musiques
     std::vector<std::string> musicPaths;
     std::vector<std::string> musicNames;
@@ -120,6 +135,7 @@ public:
     static void incrementerMisesAJour();
     static void resetMisesAJour();
     bool estEnMenu() const { return enMenu; }
+    void afficherTutorial();
 };
 
 #endif
