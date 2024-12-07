@@ -1,4 +1,4 @@
-#include "SFMLInterface.h"
+Ôªø#include "SFMLInterface.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -26,25 +26,25 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
 
     // Chargement des textures
     if (!zoomInTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-zoomer-48.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne de zoom in" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne de zoom in" << std::endl;
     }
-    if (!zoomOutTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-dÈzoomer-48.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne de zoom out" << std::endl;
+    if (!zoomOutTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-d√©zoomer-48.png")) {
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne de zoom out" << std::endl;
     }
     if (!undoTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-gauche-2-50.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne undo" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne undo" << std::endl;
     }
     if (!redoTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-droit-2-60.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne redo" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne redo" << std::endl;
     }
     if (!pauseTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-pause-48.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne de pause" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne de pause" << std::endl;
     }
     if (!playTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-lecture-50.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne de play" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne de play" << std::endl;
     }
-    if (!resetTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-mises-‡-jour-disponibles-50.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne de reset" << std::endl;
+    if (!resetTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-mises-√†-jour-disponibles-50.png")) {
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne de reset" << std::endl;
     }
     if (!oscillateurTexture.loadFromFile("C:\\Users\\malik\\Music\\oss.png")) {
         std::cerr << "Erreur : Impossible de charger l'image de l'oscillateur" << std::endl;
@@ -56,13 +56,13 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         std::cerr << "Erreur : Impossible de charger l'image du canon" << std::endl;
     }
     if (!muteTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-muet-64.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne mute" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne mute" << std::endl;
     }
     if (!soundTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-son-64.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne son" << std::endl;
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne son" << std::endl;
     }
-    if (!speedTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-Èclair-48.png")) {
-        std::cerr << "Erreur : Impossible de charger l'icÙne de vitesse" << std::endl;
+    if (!speedTexture.loadFromFile("C:\\Users\\malik\\Music\\icons8-√©clair-48.png")) {
+        std::cerr << "Erreur : Impossible de charger l'ic√¥ne de vitesse" << std::endl;
     }    // Configuration des sprites
     zoomInSprite.setTexture(zoomInTexture);
     zoomOutSprite.setTexture(zoomOutTexture);
@@ -89,7 +89,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     scale = patternSize / canonSprite.getGlobalBounds().width;
     canonSprite.setScale(scale, scale);
 
-    // Redimensionner les icÙnes de son et de vitesse
+    // Redimensionner les ic√¥nes de son et de vitesse
     float iconSize = 30.0f;
     scale = iconSize / muteSprite.getGlobalBounds().width;
     muteSprite.setScale(scale, scale);
@@ -113,7 +113,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     speedSlider.setSize(sf::Vector2f(sliderSize, sliderSize));
     speedSlider.setFillColor(sf::Color::White);
 
-    // Positionnement des ÈlÈments
+    // Positionnement des √©l√©ments
     float spacing = 20.0f;
     float startX = spacing;
     float patternY = window.getSize().y - BANDE_NOIRE_HAUTEUR / 2 - patternSize / 2;
@@ -126,12 +126,12 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     canonSprite.setPosition(startX + spacingPatterns * 2, patternY);
     resetSprite.setPosition(startX + spacingPatterns * 3, patternY);
 
-    // Configuration des textes de population et gÈnÈration
+    // Configuration des textes de population et g√©n√©ration
     populationTexte.setFont(font);
     populationTexte.setCharacterSize(20);
     populationTexte.setFillColor(sf::Color::White);
     populationTexte.setPosition(
-        speedSprite.getPosition().x + 1150,  // Avant le contrÙle de vitesse
+        speedSprite.getPosition().x + 1150,  // Avant le contr√¥le de vitesse
         controlsY - 10
     );
 
@@ -139,7 +139,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
     generationTexte.setCharacterSize(20);
     generationTexte.setFillColor(sf::Color::White);
     generationTexte.setPosition(
-        resetSprite.getPosition().x + resetSprite.getGlobalBounds().width + 100,  // AprËs l'icÙne reset
+        resetSprite.getPosition().x + resetSprite.getGlobalBounds().width + 100,  // Apr√®s l'ic√¥ne reset
         controlsY - 10
     );
     // Configuration des noms des patterns
@@ -170,7 +170,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         canonSprite.getPosition().y - 20
     );
 
-    // Position des contrÙles ‡ droite
+    // Position des contr√¥les √† droite
     float rightMargin = spacing;
 
     zoomOutSprite.setPosition(
@@ -205,7 +205,7 @@ SFMLInterface::SFMLInterface(int largeur, int hauteur, int tailleCellule)
         controlsY - speedSprite.getGlobalBounds().height / 2
     );
 
-    // Position des contrÙles au centre
+    // Position des contr√¥les au centre
     float centerX = window.getSize().x / 2;
 
     undoSprite.setPosition(
@@ -354,16 +354,18 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
                 float size = static_cast<float>(tailleCellule - 1);
 
                 if (grille.getCellule(i, j).estVivante()) {
-                    quad[0].color = sf::Color(0, 0, 255);
-                    quad[1].color = sf::Color(0, 0, 200);
-                    quad[2].color = sf::Color(148, 0, 211);
-                    quad[3].color = sf::Color(186, 85, 211);
+                    // Cellule vivante : D√©grad√© #009dff ‚Üî #00d5ff
+                    quad[0].color = sf::Color(0, 200, 255);   // #009dff (bleu vif)
+                    quad[1].color = sf::Color(0, 255, 255);   // #00d5ff (bleu clair)
+                    quad[2].color = sf::Color(0, 255, 255);   // #00d5ff (bleu clair)
+                    quad[3].color = sf::Color(0, 200, 255);   // #009dff (bleu vif)
                 }
                 else {
-                    quad[0].color = sf::Color(169, 169, 169);
-                    quad[1].color = sf::Color(169, 169, 169);
-                    quad[2].color = sf::Color(105, 105, 105);
-                    quad[3].color = sf::Color(105, 105, 105);
+                    // Cellule morte : D√©grad√© #0b0d0e ‚Üî #141014
+                    quad[0].color = sf::Color(11, 13, 14);  // #0b0d0e (gris sombre bleut√©)
+                    quad[1].color = sf::Color(20, 16, 20);  // #141014 (gris-noir)
+                    quad[2].color = sf::Color(20, 16, 20);  // #141014 (gris-noir)
+                    quad[3].color = sf::Color(11, 13, 14);  // #0b0d0e (gris sombre bleut√©)
                 }
 
                 quad[0].position = sf::Vector2f(x, y);
@@ -376,7 +378,7 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
         }
     }
 
-    // Calculer et mettre ‡ jour la population
+    // Calculer et mettre √† jour la population
     int population = 0;
     for (int i = 0; i < grille.getNbLignes(); ++i) {
         for (int j = 0; j < grille.getNbColonnes(); ++j) {
@@ -387,7 +389,7 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     }
     populationTexte.setString("Population: " + std::to_string(population));
 
-    // Mettre ‡ jour le compteur de gÈnÈrations
+    // Mettre √† jour le compteur de g√©n√©rations
     if (!enPause) {
         generation++;
     }
@@ -398,7 +400,7 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     bandeNoire.setPosition(0, static_cast<float>(window.getSize().y - BANDE_NOIRE_HAUTEUR));
     bandeNoire.setFillColor(sf::Color::Black);
     window.draw(bandeNoire);
-    // Dessiner tous les ÈlÈments de l'interface
+    // Dessiner tous les √©l√©ments de l'interface
     window.draw(oscillateurSprite);
     window.draw(planeurSprite);
     window.draw(canonSprite);
@@ -414,23 +416,23 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.draw(planeurTexte);
     window.draw(canonTexte);
 
-    // Dessiner les contrÙles
+    // Dessiner les contr√¥les
     window.draw(zoomInSprite);
     window.draw(zoomOutSprite);
     window.draw(undoSprite);
     window.draw(redoSprite);
 
-    // Dessiner les contrÙles de volume
+    // Dessiner les contr√¥les de volume
     window.draw(volumeBar);
     window.draw(volumeSlider);
     window.draw(isMuted ? muteSprite : soundSprite);
 
-    // Dessiner les contrÙles de vitesse
+    // Dessiner les contr√¥les de vitesse
     window.draw(speedBar);
     window.draw(speedSlider);
     window.draw(speedSprite);
 
-    // Dessiner la population et la gÈnÈration
+    // Dessiner la population et la g√©n√©ration
     window.draw(populationTexte);
     window.draw(generationTexte);
 
@@ -569,7 +571,7 @@ void SFMLInterface::resetGrille(Grille& grille) {
             grille.getCellule(i, j).setEtat(false);
         }
     }
-    resetMisesAJour();  // RÈinitialiser le compteur lors d'un reset
+    resetMisesAJour();  // R√©initialiser le compteur lors d'un reset
 }
 void SFMLInterface::ajouterPattern(Grille& grille, const std::vector<std::pair<int, int>>& coords, int ligneBase, int colonneBase) {
     sauvegarderEtat(grille);
@@ -663,13 +665,13 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-        // Gestion du contrÙle de la vitesse
+        // Gestion du contr√¥le de la vitesse
         if (isDraggingSpeed || speedBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
             speedSlider.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             isDraggingSpeed = true;
             handleSpeedControl(mousePos, vitesseSimulation);
         }
-        // Gestion du contrÙle du volume
+        // Gestion du contr√¥le du volume
         else if (isDraggingVolume || volumeBar.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
             volumeSlider.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             isDraggingVolume = true;
