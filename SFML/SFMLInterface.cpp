@@ -1,4 +1,5 @@
-﻿#include "SFMLInterface.h"
+﻿
+#include "SFMLInterface.h"
 #include <stdexcept>
 #include <iostream>
 
