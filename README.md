@@ -161,13 +161,17 @@ Pour initialiser la grille, fournissez un fichier d'entrée au format suivant :
 
 ## 📊 Diagramme UML  
 
-Voici un diagramme UML des cas d'utilisation pour le projet :  
 
-![diagramme cas d'utilisation ]![Capture d'écran 2024-11-28 204742](https://github.com/user-attachments/assets/6eadf8bc-53b2-4cf6-aae4-f646f08c8d1e)
+Diagramme cas d'utilisation ![Capture d'écran 2024-11-28 204742](https://github.com/user-attachments/assets/6eadf8bc-53b2-4cf6-aae4-f646f08c8d1e)
 ()
-  
+Diagramme de Séquence ![Capture d'écran 2024-12-07 204539](https://github.com/user-attachments/assets/a51dfc24-2064-43be-85ca-c8c4c4089835)
+Diagramme d'Activité ![Capture d'écran 2024-11-30 111507](https://github.com/user-attachments/assets/79b2fd2c-6ad5-4851-8045-24ca704cfed1)
+![Capture d'écran 2024-11-30 111600](https://github.com/user-attachments/assets/a37d7698-96d2-4926-a3ce-976c1b915a93)
+![Capture d'écran 2024-11-30 111629](https://github.com/user-attachments/assets/8140860e-4767-4ad4-b348-8a2df77a1cf7)
+Diagramme Classe :
+![Capture d'écran 2024-12-07 095420](https://github.com/user-attachments/assets/0905e58d-a771-48df-ba1e-ae20ebcd3b4e)
+![Capture d'écran 2024-12-07 095425](https://github.com/user-attachments/assets/c6e22875-7cb6-4839-a153-6c1ad9f3b2cf)
 
----
 
 ## 🧪 Tests Unitaires  
 
