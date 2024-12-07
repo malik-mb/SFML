@@ -382,135 +382,305 @@ void SFMLInterface::afficherThemeMenu() {
     float startY = window.getSize().y / 3;
     float spacing = 80.0f;
 
-    // Titre avec effet de bordure
+    // Effet de grille en arrière-plan
+    static float gridOffset = 0.0f;
+    gridOffset += 0.5f;
+    for (float x = -100; x < window.getSize().x + 100; x += 50) {
+        for (float y = -100; y < window.getSize().y + 100; y += 50) {
+            sf::RectangleShape gridPoint(sf::Vector2f(2, 2));
+            float xPos = x + std::sin((y + gridOffset) * 0.02f) * 10;
+            gridPoint.setPosition(xPos, y);
+            gridPoint.setFillColor(sf::Color(0, 157, 255, 20));
+            window.draw(gridPoint);
+        }
+    }
+
+    // Effet de lignes dynamiques
+    static std::vector<sf::VertexArray> lines;
+    if (lines.empty()) {
+        for (int i = 0; i < 5; i++) {
+            sf::VertexArray line(sf::Lines, 2);
+            line[0].position = sf::Vector2f(0, rand() % window.getSize().y);
+            line[1].position = sf::Vector2f(window.getSize().x, rand() % window.getSize().y);
+            line[0].color = sf::Color(0, 157, 255, 30);
+            line[1].color = sf::Color(0, 157, 255, 30);
+            lines.push_back(line);
+        }
+    }
+
+    // Animation des lignes
+    static float lineOffset = 0.0f;
+    lineOffset += 0.5f;
+    for (auto& line : lines) {
+        float y1 = line[0].position.y + std::sin(lineOffset * 0.02f) * 50;
+        float y2 = line[1].position.y + std::cos(lineOffset * 0.02f) * 50;
+        line[0].position.y = y1;
+        line[1].position.y = y2;
+        window.draw(line);
+    }
+
+    // Effet de particules optimisé
+    static std::vector<sf::CircleShape> particles;
+    static std::vector<sf::Vector2f> particleVelocities;
+
+    if (particles.empty()) {
+        for (int i = 0; i < 30; i++) {
+            sf::CircleShape particle;
+            particle.setRadius(1.5f);
+            particle.setPosition(
+                static_cast<float>(rand() % window.getSize().x),
+                static_cast<float>(rand() % window.getSize().y)
+            );
+            particle.setFillColor(sf::Color(0, 157, 255, 40));
+            particles.push_back(particle);
+
+            float angle = static_cast<float>(rand() % 360) * 3.14159f / 180.0f;
+            float speed = 0.5f;
+            particleVelocities.push_back(sf::Vector2f(
+                std::cos(angle) * speed,
+                std::sin(angle) * speed
+            ));
+        }
+    }
+
+    // Animation des particules
+    for (size_t i = 0; i < particles.size(); i++) {
+        particles[i].move(particleVelocities[i]);
+
+        if (particles[i].getPosition().x < 0)
+            particles[i].setPosition(window.getSize().x, particles[i].getPosition().y);
+        if (particles[i].getPosition().x > window.getSize().x)
+            particles[i].setPosition(0, particles[i].getPosition().y);
+        if (particles[i].getPosition().y < 0)
+            particles[i].setPosition(particles[i].getPosition().x, window.getSize().y);
+        if (particles[i].getPosition().y > window.getSize().y)
+            particles[i].setPosition(particles[i].getPosition().x, 0);
+
+        window.draw(particles[i]);
+    }
+
+    // Effet de pulsation amélioré
+    static float pulseTimer = 0.0f;
+    pulseTimer += 0.03f;
+    float pulseFactor = (std::sin(pulseTimer) + 1.0f) / 2.0f;
+
+    // Logo animé
+    static sf::CircleShape logo(40.f);
+    logo.setPosition(centreX - 40.f, 50.f);
+    logo.setFillColor(sf::Color::Transparent);
+    logo.setOutlineThickness(2.f);
+    logo.setOutlineColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(100 + 155 * pulseFactor)));
+
+    static float rotation = 0.0f;
+    rotation += 0.5f;
+    logo.setRotation(rotation);
+    window.draw(logo);
+
+    // Titre avec effet de glitch
     sf::Text titreTheme;
     titreTheme.setFont(font);
     titreTheme.setString("SELECTION THEME");
     titreTheme.setCharacterSize(50);
 
-    // Effet de bordure
+    static int glitchOffset = 0;
+    if (rand() % 30 == 0) {
+        glitchOffset = (rand() % 3) - 1;
+    }
+
     sf::Text titreBordure = titreTheme;
     titreBordure.setFillColor(sf::Color(0, 157, 255));
-    titreBordure.setOutlineThickness(2);
-    titreBordure.setOutlineColor(sf::Color::White);
+    titreBordure.setOutlineThickness(3);
+    titreBordure.setOutlineColor(sf::Color(255, 255, 255, static_cast<sf::Uint8>(128 + 127 * pulseFactor)));
     titreBordure.setPosition(
         centreX - titreBordure.getLocalBounds().width / 2,
         startY - 100
     );
-    window.draw(titreBordure);
 
-    // Options de musique avec cadres
+    sf::Text titreGlitch = titreBordure;
+    titreGlitch.setFillColor(sf::Color(255, 0, 100, 50));
+    titreGlitch.setPosition(
+        titreBordure.getPosition().x + glitchOffset,
+        titreBordure.getPosition().y
+    );
+
+    window.draw(titreGlitch);
+    window.draw(titreBordure);
+    // Récupération position souris
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-    // Affichage des musiques avec cadres stylisés
+    // Options de musique avec effets améliorés
     for (size_t i = 0; i < musicNames.size(); i++) {
-        // Cadre de l'option
         sf::RectangleShape cadre;
-        float cadreWidth = 300.0f;
-        float cadreHeight = 50.0f;
+        float cadreWidth = 350.0f;
+        float cadreHeight = 60.0f;
         cadre.setSize(sf::Vector2f(cadreWidth, cadreHeight));
         cadre.setPosition(
             centreX - cadreWidth / 2,
-            startY + i * spacing - 10
+            startY + i * spacing - 15
         );
         cadre.setFillColor(sf::Color(20, 20, 40, 200));
         cadre.setOutlineThickness(2);
+
+        // Effet de brillance pour l'option sélectionnée
+        if (i == selectedMusic) {
+            sf::RectangleShape glow = cadre;
+            glow.setFillColor(sf::Color::Transparent);
+            glow.setOutlineThickness(4);
+            glow.setOutlineColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(50 + 100 * pulseFactor)));
+            window.draw(glow);
+
+            cadre.setOutlineColor(sf::Color(0, 157, 255));
+        }
+        else {
+            cadre.setOutlineColor(sf::Color(100, 100, 100));
+        }
+
+        // Icône de musique
+        sf::CircleShape musicIcon(10.f, 3);  // Triangle pour symbole de lecture
+        musicIcon.setPosition(
+            cadre.getPosition().x + 20,
+            cadre.getPosition().y + cadreHeight / 2 - 10
+        );
+        musicIcon.setFillColor(i == selectedMusic ? sf::Color(0, 157, 255) : sf::Color(150, 150, 150));
 
         sf::Text musicOption;
         musicOption.setFont(font);
         musicOption.setString(musicNames[i]);
         musicOption.setCharacterSize(30);
-
-        if (i == selectedMusic) {
-            cadre.setOutlineColor(sf::Color(0, 255, 255));
-            musicOption.setFillColor(sf::Color(0, 255, 255));
-        }
-        else {
-            cadre.setOutlineColor(sf::Color(100, 100, 100));
-            musicOption.setFillColor(sf::Color::White);
-        }
-
+        musicOption.setFillColor(i == selectedMusic ? sf::Color(0, 157, 255) : sf::Color::White);
         musicOption.setPosition(
             centreX - musicOption.getLocalBounds().width / 2,
             startY + i * spacing
         );
 
+        // Effet de survol
         if (cadre.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             cadre.setFillColor(sf::Color(40, 40, 60, 200));
             musicOption.setFillColor(sf::Color(0, 255, 255));
+            musicIcon.setFillColor(sf::Color(0, 255, 255));
+
+            // Effet de particules au survol
+            if (rand() % 10 == 0) {
+                sf::CircleShape hoverParticle;
+                hoverParticle.setRadius(1.0f);
+                hoverParticle.setPosition(
+                    cadre.getPosition().x + rand() % static_cast<int>(cadreWidth),
+                    cadre.getPosition().y + cadreHeight
+                );
+                hoverParticle.setFillColor(sf::Color(0, 255, 255, 100));
+                window.draw(hoverParticle);
+            }
         }
 
         window.draw(cadre);
+        window.draw(musicIcon);
         window.draw(musicOption);
     }
 
-    // Affichage des thèmes de couleur
+    // Séparateur animé
     float themeStartY = startY + (musicNames.size() + 1) * spacing;
 
-    // Séparateur
     sf::RectangleShape separator(sf::Vector2f(400.f, 2.f));
     separator.setPosition(centreX - 200.f, themeStartY - spacing / 2);
-    separator.setFillColor(sf::Color(100, 100, 100));
+
+    // Effet de gradient animé sur le séparateur
+    float gradientPos = (std::sin(pulseTimer * 2) + 1.0f) / 2.0f * 400.f;
+    sf::Color sepColor(100, 100, 100);
+    sf::Color glowColor(0, 157, 255);
+
+    separator.setFillColor(sepColor);
     window.draw(separator);
 
+    sf::RectangleShape separatorGlow(sf::Vector2f(100.f, 2.f));
+    separatorGlow.setPosition(centreX - 200.f + gradientPos, themeStartY - spacing / 2);
+    separatorGlow.setFillColor(glowColor);
+    window.draw(separatorGlow);
+
+    // Options de thème avec effets améliorés
     for (size_t i = 0; i < themeNames.size(); i++) {
-        // Cadre du thème
         sf::RectangleShape themeCadre;
-        float cadreWidth = 300.0f;
-        float cadreHeight = 50.0f;
+        float cadreWidth = 350.0f;
+        float cadreHeight = 60.0f;
         themeCadre.setSize(sf::Vector2f(cadreWidth, cadreHeight));
         themeCadre.setPosition(
             centreX - cadreWidth / 2,
-            themeStartY + i * spacing - 10
+            themeStartY + i * spacing - 15
         );
         themeCadre.setFillColor(sf::Color(20, 20, 40, 200));
         themeCadre.setOutlineThickness(2);
+
+        // Couleurs selon le thème
+        sf::Color themeColor;
+        switch (i) {
+        case 0: themeColor = sf::Color(0, 157, 255); break;  // BLUE
+        case 1: themeColor = sf::Color(0, 255, 50); break;   // GREEN
+        case 2: themeColor = sf::Color(255, 0, 31); break;   // RED
+        }
+
+        // Effet de sélection
+        if (i == static_cast<int>(currentTheme)) {
+            sf::RectangleShape glow = themeCadre;
+            glow.setFillColor(sf::Color::Transparent);
+            glow.setOutlineThickness(4);
+            glow.setOutlineColor(sf::Color(
+                themeColor.r,
+                themeColor.g,
+                themeColor.b,
+                static_cast<sf::Uint8>(50 + 100 * pulseFactor)
+            ));
+            window.draw(glow);
+
+            themeCadre.setOutlineColor(themeColor);
+        }
+        else {
+            themeCadre.setOutlineColor(sf::Color(100, 100, 100));
+        }
+
+        // Icône du thème
+        sf::CircleShape themeIcon(15.f);
+        themeIcon.setPosition(
+            themeCadre.getPosition().x + 20,
+            themeCadre.getPosition().y + cadreHeight / 2 - 15
+        );
+        themeIcon.setFillColor(themeColor);
 
         sf::Text themeOption;
         themeOption.setFont(font);
         themeOption.setString(themeNames[i]);
         themeOption.setCharacterSize(30);
-
-        // Couleur selon le thème sélectionné
-        if (i == static_cast<int>(currentTheme)) {
-            switch (currentTheme) {
-            case ColorTheme::BLUE:
-                themeCadre.setOutlineColor(sf::Color(0, 157, 255));
-                themeOption.setFillColor(sf::Color(0, 157, 255));
-                break;
-            case ColorTheme::GREEN:
-                themeCadre.setOutlineColor(sf::Color(0, 255, 50));
-                themeOption.setFillColor(sf::Color(0, 255, 50));
-                break;
-            case ColorTheme::RED:
-                themeCadre.setOutlineColor(sf::Color(255, 0, 31));
-                themeOption.setFillColor(sf::Color(255, 0, 31));
-                break;
-            }
-        }
-        else {
-            themeCadre.setOutlineColor(sf::Color(100, 100, 100));
-            themeOption.setFillColor(sf::Color::White);
-        }
-
+        themeOption.setFillColor(i == static_cast<int>(currentTheme) ? themeColor : sf::Color::White);
         themeOption.setPosition(
             centreX - themeOption.getLocalBounds().width / 2,
             themeStartY + i * spacing
         );
 
+        // Effet de survol
         if (themeCadre.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             themeCadre.setFillColor(sf::Color(40, 40, 60, 200));
             themeOption.setFillColor(sf::Color(0, 255, 255));
+
+            // Effet de particules au survol
+            if (rand() % 10 == 0) {
+                sf::CircleShape hoverParticle;
+                hoverParticle.setRadius(1.0f);
+                hoverParticle.setPosition(
+                    themeCadre.getPosition().x + rand() % static_cast<int>(cadreWidth),
+                    themeCadre.getPosition().y + cadreHeight
+                );
+                hoverParticle.setFillColor(sf::Color(0, 255, 255, 100));
+                window.draw(hoverParticle);
+            }
         }
 
         window.draw(themeCadre);
+        window.draw(themeIcon);
         window.draw(themeOption);
     }
 
-    // Bouton retour stylisé
+    // Bouton retour avec effets améliorés
     sf::RectangleShape retourCadre;
-    float retourWidth = 200.0f;
-    float retourHeight = 40.0f;
+    float retourWidth = 250.0f;
+    float retourHeight = 50.0f;
     retourCadre.setSize(sf::Vector2f(retourWidth, retourHeight));
     retourCadre.setPosition(
         centreX - retourWidth / 2,
@@ -527,16 +697,33 @@ void SFMLInterface::afficherThemeMenu() {
     retourTexte.setFillColor(sf::Color::White);
     retourTexte.setPosition(
         centreX - retourTexte.getLocalBounds().width / 2,
-        themeStartY + themeNames.size() * spacing + 50
+        themeStartY + themeNames.size() * spacing + 55
     );
 
+    // Effet de survol sur le bouton retour
     if (retourCadre.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
         retourCadre.setFillColor(sf::Color(40, 40, 60, 200));
         retourTexte.setFillColor(sf::Color(0, 255, 255));
+
+        // Effet de brillance
+        sf::RectangleShape retourGlow = retourCadre;
+        retourGlow.setFillColor(sf::Color::Transparent);
+        retourGlow.setOutlineThickness(4);
+        retourGlow.setOutlineColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(50 + 100 * pulseFactor)));
+        window.draw(retourGlow);
     }
 
     window.draw(retourCadre);
     window.draw(retourTexte);
+
+    // Effet de scan-lines
+    for (int y = 0; y < window.getSize().y; y += 4) {
+        sf::RectangleShape scanLine(sf::Vector2f(window.getSize().x, 1));
+        scanLine.setPosition(0, y);
+        scanLine.setFillColor(sf::Color(255, 255, 255, 3));
+        window.draw(scanLine);
+    }
+
     window.display();
 }
 

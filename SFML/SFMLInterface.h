@@ -27,7 +27,8 @@ private:
     size_t selectedMusic;
     static int generation;
     static int nombreMisesAJour;
-
+    std::vector<sf::CircleShape> particles;  // Pour l'effet de particules
+    float pulseTimer;  // Pour l'effet de pulsation
     // Vecteurs pour la gestion des musiques
     std::vector<std::string> musicPaths;
     std::vector<std::string> musicNames;
