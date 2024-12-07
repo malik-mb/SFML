@@ -765,13 +765,10 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                     enPause = !enPause;
                     break;
                 case sf::Keyboard::Escape:
-                    if (enPleinEcran) {
-                        window.create(sf::VideoMode(800, 600), "Jeu de la Vie", sf::Style::Close);
-                        enPleinEcran = false;
-                    }
-                    else {
-                        window.create(sf::VideoMode::getDesktopMode(), "Jeu de la Vie", sf::Style::Fullscreen);
-                        enPleinEcran = true;
+                    if (!enMenu) {  // Si on n'est pas déjà dans le menu
+                        enMenu = true;  // Retour au menu
+                        enPause = true; // Mettre le jeu en pause
+                        
                     }
                     break;
                 }

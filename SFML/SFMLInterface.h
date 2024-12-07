@@ -74,12 +74,17 @@ private:
     bool estEnTrainDeModifier;
     sf::Vector2i derniereCelluleModifiee;
     static int generation;
-    int nombreIterations;  // Variable pour stocker
+    int nombreIterations;
     std::stack<std::vector<std::vector<bool>>> undoStack;
     std::stack<std::vector<std::vector<bool>>> redoStack;
 
+    // Nouvelles variables pour l'animation
+    float animationTime;
+    sf::VertexArray backgroundAnimation;
+
     static const int BANDE_NOIRE_HAUTEUR = 100;
-     static int nombreMisesAJour;  // Pour compter les mises à jour
+    static int nombreMisesAJour;
+
     void updateVolumeSlider();
     void updateSpeedSlider();
     void handleVolumeControl(const sf::Vector2i& mousePos);
@@ -90,6 +95,7 @@ private:
     void ajouterCanon(Grille& grille, int ligneBase, int colonneBase);
     void ajouterOscillateur(Grille& grille, int ligneBase, int colonneBase);
     void resetGeneration();
+    void updateBackgroundAnimation();
 
 public:
     bool enMenu;
@@ -112,5 +118,4 @@ public:
     void toggleCelluleAvecSouris(Grille& grille, const sf::Vector2i& mousePos);
     void incrementerMisesAJour();
     void resetMisesAJour();
-
 };
