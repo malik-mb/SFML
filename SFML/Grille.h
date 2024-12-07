@@ -33,7 +33,6 @@ public:
                 etatPrecedent[i][j] = cellules[i][j].estVivante();
             }
         }
-
         calculerProchaineIteration();
     }
 };
