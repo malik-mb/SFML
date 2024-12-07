@@ -442,7 +442,7 @@ void SFMLInterface::afficherThemeMenu() {
                 themeOption.setFillColor(sf::Color(0, 255, 50));
                 break;
             case ColorTheme::RED:
-                themeOption.setFillColor(sf::Color(255, 0, 30));
+                themeOption.setFillColor(sf::Color(255, 0, 31));
                 break;
             }
         }
