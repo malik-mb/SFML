@@ -89,7 +89,7 @@ En haut de l'écran, retrouvez des options pour configurer et interagir avec la 
 
 ## 🌈 **Personnalisation**
 - Rendez le jeu encore plus amusant en modifiant son apparence !
-  - Accédez au menu **THEME** pour changer les couleurs et styles (par exemple : mode clair 🌞 ou sombre 🌑).
+  - Accédez au menu **THEME** pour changer les couleurs et styles .
 
 ---
 
