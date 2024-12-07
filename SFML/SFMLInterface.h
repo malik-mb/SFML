@@ -35,7 +35,13 @@ private:
     // Stacks pour undo/redo
     std::stack<std::vector<std::vector<bool>>> undoStack;
     std::stack<std::vector<std::vector<bool>>> redoStack;
-
+    enum class ColorTheme {
+        BLUE,   // Thème actuel
+        GREEN,  // Nouveau thème vert
+        RED     // Nouveau thème rouge
+    };
+    ColorTheme currentTheme = ColorTheme::BLUE;
+    std::vector<std::string> themeNames = { "BLUE THEME", "GREEN THEME", "RED THEME" };
     // Musique
     sf::Music menuMusic;
 

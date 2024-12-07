@@ -385,7 +385,7 @@ void SFMLInterface::afficherThemeMenu() {
     // Titre
     sf::Text titreTheme;
     titreTheme.setFont(font);
-    titreTheme.setString("SELECTION MUSIQUE");
+    titreTheme.setString("SELECTION THEME");
     titreTheme.setCharacterSize(40);
     titreTheme.setFillColor(sf::Color::White);
     titreTheme.setPosition(
@@ -397,13 +397,13 @@ void SFMLInterface::afficherThemeMenu() {
     // Options de musique
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
+    // Affichage des musiques
     for (size_t i = 0; i < musicNames.size(); i++) {
         sf::Text musicOption;
         musicOption.setFont(font);
         musicOption.setString(musicNames[i]);
         musicOption.setCharacterSize(30);
 
-        // Mettre en surbrillance la musique sélectionnée
         if (i == selectedMusic) {
             musicOption.setFillColor(sf::Color(0, 255, 255));
         }
@@ -416,13 +416,52 @@ void SFMLInterface::afficherThemeMenu() {
             startY + i * spacing
         );
 
-        // Effet de survol
         if (musicOption.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             musicOption.setFillColor(sf::Color(0, 255, 255));
         }
 
         window.draw(musicOption);
     }
+
+    // Affichage des thèmes de couleur
+    float themeStartY = startY + (musicNames.size() + 1) * spacing;
+
+    for (size_t i = 0; i < themeNames.size(); i++) {
+        sf::Text themeOption;
+        themeOption.setFont(font);
+        themeOption.setString(themeNames[i]);
+        themeOption.setCharacterSize(30);
+
+        // Couleur selon le thème
+        if (i == static_cast<int>(currentTheme)) {
+            switch (currentTheme) {
+            case ColorTheme::BLUE:
+                themeOption.setFillColor(sf::Color(0, 157, 255));
+                break;
+            case ColorTheme::GREEN:
+                themeOption.setFillColor(sf::Color(0, 255, 50));
+                break;
+            case ColorTheme::RED:
+                themeOption.setFillColor(sf::Color(255, 0, 30));
+                break;
+            }
+        }
+        else {
+            themeOption.setFillColor(sf::Color::White);
+        }
+
+        themeOption.setPosition(
+            centreX - themeOption.getLocalBounds().width / 2,
+            themeStartY + i * spacing
+        );
+
+        if (themeOption.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            themeOption.setFillColor(sf::Color(0, 255, 255));
+        }
+
+        window.draw(themeOption);
+    }
+
     // Bouton retour
     sf::Text retourTexte;
     retourTexte.setFont(font);
@@ -431,7 +470,7 @@ void SFMLInterface::afficherThemeMenu() {
     retourTexte.setFillColor(sf::Color::White);
     retourTexte.setPosition(
         centreX - retourTexte.getLocalBounds().width / 2,
-        startY + musicNames.size() * spacing + 50
+        themeStartY + themeNames.size() * spacing + 50
     );
 
     if (retourTexte.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
@@ -495,18 +534,33 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
                 float size = static_cast<float>(tailleCellule - 1);
 
                 if (grille.getCellule(i, j).estVivante()) {
-                    // Cellule vivante : Dégradé #009dff ↔ #00d5ff
-                    quad[0].color = sf::Color(0, 200, 255);   // #009dff (bleu vif)
-                    quad[1].color = sf::Color(0, 255, 255);   // #00d5ff (bleu clair)
-                    quad[2].color = sf::Color(0, 255, 255);   // #00d5ff (bleu clair)
-                    quad[3].color = sf::Color(0, 200, 255);   // #009dff (bleu vif)
+                    switch (currentTheme) {
+                    case ColorTheme::BLUE:
+                        quad[0].color = sf::Color(0, 200, 255);   // Bleu vif
+                        quad[1].color = sf::Color(0, 255, 255);   // Bleu clair
+                        quad[2].color = sf::Color(0, 255, 255);
+                        quad[3].color = sf::Color(0, 200, 255);
+                        break;
+                    case ColorTheme::GREEN:
+                        quad[0].color = sf::Color(0, 255, 0);   // Vert vif
+                        quad[1].color = sf::Color(0, 255, 50);   // Vert clair
+                        quad[2].color = sf::Color(0, 255, 50);
+                        quad[3].color = sf::Color(0, 255, 0);
+                        break;
+                    case ColorTheme::RED:
+                        quad[0].color = sf::Color(255, 0, 0);   // Rouge vif
+                        quad[1].color = sf::Color(255, 0, 30);   // Rouge clair
+                        quad[2].color = sf::Color(255, 0, 30);
+                        quad[3].color = sf::Color(255, 0, 0);
+                        break;
+                    }
                 }
                 else {
-                    // Cellule morte : Dégradé #0b0d0e ↔ #141014
-                    quad[0].color = sf::Color(11, 13, 14);  // #0b0d0e (gris sombre bleuté)
-                    quad[1].color = sf::Color(20, 16, 20);  // #141014 (gris-noir)
-                    quad[2].color = sf::Color(20, 16, 20);  // #141014 (gris-noir)
-                    quad[3].color = sf::Color(11, 13, 14);  // #0b0d0e (gris sombre bleuté)
+                    // Cellule morte : même dégradé pour tous les thèmes
+                    quad[0].color = sf::Color(11, 13, 14);  // Gris sombre
+                    quad[1].color = sf::Color(20, 16, 20);  // Gris-noir
+                    quad[2].color = sf::Color(20, 16, 20);
+                    quad[3].color = sf::Color(11, 13, 14);
                 }
 
                 quad[0].position = sf::Vector2f(x, y);
@@ -518,6 +572,8 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
             }
         }
     }
+
+    // Calcul de la population
     int population = 0;
     for (int i = 0; i < grille.getNbLignes(); ++i) {
         for (int j = 0; j < grille.getNbColonnes(); ++j) {
@@ -534,9 +590,8 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     bandeNoire.setPosition(0, window.getSize().y - BANDE_NOIRE_HAUTEUR);
     bandeNoire.setFillColor(sf::Color(11, 13, 30));
     window.draw(bandeNoire);
-    // Mise à jour des textes
 
-    // Dessiner les patterns et leurs noms
+    // Dessiner tous les éléments de l'interface
     window.draw(oscillateurSprite);
     window.draw(planeurSprite);
     window.draw(canonSprite);
@@ -547,34 +602,19 @@ void SFMLInterface::afficherGrille(const Grille& grille, bool enPause) {
     window.draw(oscillateurTexte);
     window.draw(planeurTexte);
     window.draw(canonTexte);
-
-    // Dessiner les contrôles de zoom
     window.draw(zoomInSprite);
     window.draw(zoomOutSprite);
     window.draw(undoSprite);
     window.draw(redoSprite);
-
-    // Dessiner les contrôles de volume
     window.draw(volumeBar);
     window.draw(volumeSlider);
     window.draw(isMuted ? muteSprite : soundSprite);
-
-    // Dessiner les contrôles de vitesse
     window.draw(speedBar);
     window.draw(speedSlider);
     window.draw(speedSprite);
-
-    // Dessiner la population et la génération
     window.draw(populationTexte);
     window.draw(generationTexte);
-
-    // Dessiner le bouton play/pause
-    if (enPause) {
-        window.draw(playSprite);
-    }
-    else {
-        window.draw(pauseSprite);
-    }
+    window.draw(enPause ? playSprite : pauseSprite);
 
     window.display();
 }
@@ -849,6 +889,23 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                     }
                 }
 
+                // Vérifier les clics sur les options de thème
+                float themeStartY = startY + (musicNames.size() + 1) * spacing;
+                for (size_t i = 0; i < themeNames.size(); i++) {
+                    sf::Text themeOption;
+                    themeOption.setFont(font);
+                    themeOption.setString(themeNames[i]);
+                    themeOption.setCharacterSize(30);
+                    themeOption.setPosition(
+                        centreX - themeOption.getLocalBounds().width / 2,
+                        themeStartY + i * spacing
+                    );
+
+                    if (themeOption.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        currentTheme = static_cast<ColorTheme>(i);
+                    }
+                }
+
                 // Vérifier le clic sur le bouton retour
                 sf::Text retourTexte;
                 retourTexte.setFont(font);
@@ -856,7 +913,7 @@ void SFMLInterface::attendreEvenements(int& vitesseSimulation, bool& enPause, Gr
                 retourTexte.setCharacterSize(30);
                 retourTexte.setPosition(
                     centreX - retourTexte.getLocalBounds().width / 2,
-                    startY + musicNames.size() * spacing + 50
+                    themeStartY + themeNames.size() * spacing + 50
                 );
 
                 if (retourTexte.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
