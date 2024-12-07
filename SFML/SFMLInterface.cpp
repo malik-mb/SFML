@@ -395,6 +395,122 @@ void SFMLInterface::afficherThemeMenu() {
         }
     }
 
+    // Éléments décoratifs sur les côtés
+    // Cercles connectés à gauche
+    static std::vector<sf::CircleShape> leftCircles;
+    static std::vector<float> leftCirclesPulse;
+    if (leftCircles.empty()) {
+        for (int i = 0; i < 5; i++) {
+            sf::CircleShape circle(20.f);
+            circle.setPosition(50.f, 150.f + i * 120.f);
+            circle.setFillColor(sf::Color::Transparent);
+            circle.setOutlineThickness(2.f);
+            leftCircles.push_back(circle);
+            leftCirclesPulse.push_back(static_cast<float>(rand()) / RAND_MAX * 6.28f);
+        }
+    }
+
+    // Lignes verticales décoratives
+    sf::RectangleShape leftLine(sf::Vector2f(2.f, window.getSize().y));
+    leftLine.setPosition(100.f, 0);
+    leftLine.setFillColor(sf::Color(0, 157, 255, 40));
+    window.draw(leftLine);
+
+    sf::RectangleShape rightLine(sf::Vector2f(2.f, window.getSize().y));
+    rightLine.setPosition(window.getSize().x - 100.f, 0);
+    rightLine.setFillColor(sf::Color(0, 157, 255, 40));
+    window.draw(rightLine);
+
+    // Animation des cercles et connexions
+    for (size_t i = 0; i < leftCircles.size(); i++) {
+        leftCirclesPulse[i] += 0.02f;
+        float pulsation = (std::sin(leftCirclesPulse[i]) + 1.f) / 2.f;
+
+        leftCircles[i].setOutlineColor(sf::Color(0, 157, 255,
+            static_cast<sf::Uint8>(100 + 155 * pulsation)));
+
+        window.draw(leftCircles[i]);
+
+        // Lignes horizontales connectant les cercles
+        sf::RectangleShape connector(sf::Vector2f(40.f, 2.f));
+        connector.setPosition(leftCircles[i].getPosition().x + 40.f,
+            leftCircles[i].getPosition().y + 20.f);
+        connector.setFillColor(sf::Color(0, 157, 255,
+            static_cast<sf::Uint8>(40 + 60 * pulsation)));
+        window.draw(connector);
+
+        // Texte décoratif
+        sf::Text decorText;
+        decorText.setFont(font);
+        decorText.setString(std::to_string(i + 1) + ".0");
+        decorText.setCharacterSize(15);
+        decorText.setFillColor(sf::Color(0, 157, 255,
+            static_cast<sf::Uint8>(100 + 155 * pulsation)));
+        decorText.setPosition(
+            leftCircles[i].getPosition().x - 40.f,
+            leftCircles[i].getPosition().y + 10.f
+        );
+        window.draw(decorText);
+    }
+    // Éléments décoratifs à droite
+    static std::vector<sf::RectangleShape> rightBars;
+    static std::vector<float> rightBarsPulse;
+    if (rightBars.empty()) {
+        for (int i = 0; i < 8; i++) {
+            sf::RectangleShape bar(sf::Vector2f(30.f, 3.f));
+            bar.setPosition(window.getSize().x - 90.f, 100.f + i * 80.f);
+            rightBars.push_back(bar);
+            rightBarsPulse.push_back(static_cast<float>(rand()) / RAND_MAX * 6.28f);
+        }
+    }
+
+    // Animation des barres droites
+    for (size_t i = 0; i < rightBars.size(); i++) {
+        rightBarsPulse[i] += 0.03f;
+        float pulsation = (std::sin(rightBarsPulse[i]) + 1.f) / 2.f;
+
+        rightBars[i].setFillColor(sf::Color(0, 157, 255,
+            static_cast<sf::Uint8>(100 + 155 * pulsation)));
+
+        // Variation de la longueur des barres
+        float baseWidth = 30.f;
+        float extraWidth = 20.f * pulsation;
+        rightBars[i].setSize(sf::Vector2f(baseWidth + extraWidth, 3.f));
+
+        window.draw(rightBars[i]);
+
+        // Points décoratifs
+        sf::CircleShape dot(2.f);
+        dot.setPosition(
+            rightBars[i].getPosition().x + baseWidth + extraWidth + 10.f,
+            rightBars[i].getPosition().y - 1.f
+        );
+        dot.setFillColor(sf::Color(0, 157, 255,
+            static_cast<sf::Uint8>(100 + 155 * pulsation)));
+        window.draw(dot);
+    }
+
+    // Motif hexagonal décoratif
+    static float hexRotation = 0.f;
+    hexRotation += 0.2f;
+
+    sf::CircleShape hexagon(40.f, 6);
+    hexagon.setPosition(window.getSize().x - 150.f, 50.f);
+    hexagon.setFillColor(sf::Color::Transparent);
+    hexagon.setOutlineThickness(2.f);
+    hexagon.setOutlineColor(sf::Color(0, 157, 255, 100));
+    hexagon.setRotation(hexRotation);
+    window.draw(hexagon);
+
+    // Petit hexagone intérieur
+    sf::CircleShape innerHex(20.f, 6);
+    innerHex.setPosition(window.getSize().x - 130.f, 70.f);
+    innerHex.setFillColor(sf::Color::Transparent);
+    innerHex.setOutlineThickness(2.f);
+    innerHex.setOutlineColor(sf::Color(0, 157, 255, 100));
+    innerHex.setRotation(-hexRotation);
+    window.draw(innerHex);
+
     // Effet de lignes dynamiques
     static std::vector<sf::VertexArray> lines;
     if (lines.empty()) {
@@ -422,7 +538,7 @@ void SFMLInterface::afficherThemeMenu() {
     // Effet de particules optimisé
     static std::vector<sf::CircleShape> particles;
     static std::vector<sf::Vector2f> particleVelocities;
-
+    // Initialisation des particules
     if (particles.empty()) {
         for (int i = 0; i < 30; i++) {
             sf::CircleShape particle;
@@ -505,9 +621,9 @@ void SFMLInterface::afficherThemeMenu() {
 
     window.draw(titreGlitch);
     window.draw(titreBordure);
+
     // Récupération position souris
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
     // Options de musique avec effets améliorés
     for (size_t i = 0; i < musicNames.size(); i++) {
         sf::RectangleShape cadre;
@@ -535,14 +651,19 @@ void SFMLInterface::afficherThemeMenu() {
             cadre.setOutlineColor(sf::Color(100, 100, 100));
         }
 
-        // Icône de musique
-        sf::CircleShape musicIcon(10.f, 3);  // Triangle pour symbole de lecture
+        // Icône de musique animée
+        static float noteRotation = 0.0f;
+        noteRotation += 0.5f;
+
+        sf::CircleShape musicIcon(10.f, 3);
         musicIcon.setPosition(
             cadre.getPosition().x + 20,
             cadre.getPosition().y + cadreHeight / 2 - 10
         );
+        musicIcon.setRotation(noteRotation);
         musicIcon.setFillColor(i == selectedMusic ? sf::Color(0, 157, 255) : sf::Color(150, 150, 150));
 
+        // Texte de l'option
         sf::Text musicOption;
         musicOption.setFont(font);
         musicOption.setString(musicNames[i]);
@@ -559,7 +680,7 @@ void SFMLInterface::afficherThemeMenu() {
             musicOption.setFillColor(sf::Color(0, 255, 255));
             musicIcon.setFillColor(sf::Color(0, 255, 255));
 
-            // Effet de particules au survol
+            // Particules au survol
             if (rand() % 10 == 0) {
                 sf::CircleShape hoverParticle;
                 hoverParticle.setRadius(1.0f);
@@ -570,6 +691,12 @@ void SFMLInterface::afficherThemeMenu() {
                 hoverParticle.setFillColor(sf::Color(0, 255, 255, 100));
                 window.draw(hoverParticle);
             }
+
+            // Ligne d'énergie au survol
+            sf::RectangleShape energyLine(sf::Vector2f(cadreWidth, 2.f));
+            energyLine.setPosition(cadre.getPosition().x, cadre.getPosition().y + cadreHeight - 2);
+            energyLine.setFillColor(sf::Color(0, 255, 255, static_cast<sf::Uint8>(100 + 155 * pulseFactor)));
+            window.draw(energyLine);
         }
 
         window.draw(cadre);
@@ -582,20 +709,15 @@ void SFMLInterface::afficherThemeMenu() {
 
     sf::RectangleShape separator(sf::Vector2f(400.f, 2.f));
     separator.setPosition(centreX - 200.f, themeStartY - spacing / 2);
-
-    // Effet de gradient animé sur le séparateur
-    float gradientPos = (std::sin(pulseTimer * 2) + 1.0f) / 2.0f * 400.f;
-    sf::Color sepColor(100, 100, 100);
-    sf::Color glowColor(0, 157, 255);
-
-    separator.setFillColor(sepColor);
+    separator.setFillColor(sf::Color(100, 100, 100));
     window.draw(separator);
 
+    // Effet de gradient sur le séparateur
+    float gradientPos = (std::sin(pulseTimer * 2) + 1.0f) / 2.0f * 400.f;
     sf::RectangleShape separatorGlow(sf::Vector2f(100.f, 2.f));
     separatorGlow.setPosition(centreX - 200.f + gradientPos, themeStartY - spacing / 2);
-    separatorGlow.setFillColor(glowColor);
+    separatorGlow.setFillColor(sf::Color(0, 157, 255));
     window.draw(separatorGlow);
-
     // Options de thème avec effets améliorés
     for (size_t i = 0; i < themeNames.size(); i++) {
         sf::RectangleShape themeCadre;
@@ -619,6 +741,7 @@ void SFMLInterface::afficherThemeMenu() {
 
         // Effet de sélection
         if (i == static_cast<int>(currentTheme)) {
+            // Effet de halo
             sf::RectangleShape glow = themeCadre;
             glow.setFillColor(sf::Color::Transparent);
             glow.setOutlineThickness(4);
@@ -631,18 +754,40 @@ void SFMLInterface::afficherThemeMenu() {
             window.draw(glow);
 
             themeCadre.setOutlineColor(themeColor);
+
+            // Particules d'énergie pour le thème sélectionné
+            if (rand() % 20 == 0) {
+                sf::CircleShape energyParticle(2.f);
+                energyParticle.setPosition(
+                    themeCadre.getPosition().x + rand() % static_cast<int>(cadreWidth),
+                    themeCadre.getPosition().y + rand() % static_cast<int>(cadreHeight)
+                );
+                energyParticle.setFillColor(sf::Color(
+                    themeColor.r,
+                    themeColor.g,
+                    themeColor.b,
+                    100
+                ));
+                window.draw(energyParticle);
+            }
         }
         else {
             themeCadre.setOutlineColor(sf::Color(100, 100, 100));
         }
 
-        // Icône du thème
+        // Icône du thème avec animation
         sf::CircleShape themeIcon(15.f);
         themeIcon.setPosition(
             themeCadre.getPosition().x + 20,
             themeCadre.getPosition().y + cadreHeight / 2 - 15
         );
         themeIcon.setFillColor(themeColor);
+
+        // Animation de l'icône
+        if (i == static_cast<int>(currentTheme)) {
+            float scale = 1.0f + 0.1f * pulseFactor;
+            themeIcon.setScale(scale, scale);
+        }
 
         sf::Text themeOption;
         themeOption.setFont(font);
@@ -659,17 +804,11 @@ void SFMLInterface::afficherThemeMenu() {
             themeCadre.setFillColor(sf::Color(40, 40, 60, 200));
             themeOption.setFillColor(sf::Color(0, 255, 255));
 
-            // Effet de particules au survol
-            if (rand() % 10 == 0) {
-                sf::CircleShape hoverParticle;
-                hoverParticle.setRadius(1.0f);
-                hoverParticle.setPosition(
-                    themeCadre.getPosition().x + rand() % static_cast<int>(cadreWidth),
-                    themeCadre.getPosition().y + cadreHeight
-                );
-                hoverParticle.setFillColor(sf::Color(0, 255, 255, 100));
-                window.draw(hoverParticle);
-            }
+            // Ligne d'énergie au survol
+            sf::RectangleShape energyLine(sf::Vector2f(cadreWidth, 2.f));
+            energyLine.setPosition(themeCadre.getPosition().x, themeCadre.getPosition().y + cadreHeight - 2);
+            energyLine.setFillColor(sf::Color(0, 255, 255, static_cast<sf::Uint8>(100 + 155 * pulseFactor)));
+            window.draw(energyLine);
         }
 
         window.draw(themeCadre);
@@ -677,7 +816,22 @@ void SFMLInterface::afficherThemeMenu() {
         window.draw(themeOption);
     }
 
-    // Bouton retour avec effets améliorés
+    // Effet de scan-lines
+    for (int y = 0; y < window.getSize().y; y += 4) {
+        sf::RectangleShape scanLine(sf::Vector2f(window.getSize().x, 1));
+        scanLine.setPosition(0, y);
+        scanLine.setFillColor(sf::Color(255, 255, 255, 3));
+        window.draw(scanLine);
+    }
+
+    // Effet de vignette final
+    sf::RectangleShape vignette;
+    vignette.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
+    vignette.setPosition(0, 0);
+    float vignetteIntensity = 0.3f + 0.1f * pulseFactor;
+    sf::Color vignetteColor(0, 0, 20, static_cast<sf::Uint8>(200 * vignetteIntensity));
+    vignette.setFillColor(vignetteColor);
+    window.draw(vignette);
     sf::RectangleShape retourCadre;
     float retourWidth = 250.0f;
     float retourHeight = 50.0f;
@@ -711,19 +865,46 @@ void SFMLInterface::afficherThemeMenu() {
         retourGlow.setOutlineThickness(4);
         retourGlow.setOutlineColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(50 + 100 * pulseFactor)));
         window.draw(retourGlow);
+
+        // Particules au survol
+        if (rand() % 10 == 0) {
+            sf::CircleShape hoverParticle;
+            hoverParticle.setRadius(1.0f);
+            hoverParticle.setPosition(
+                retourCadre.getPosition().x + rand() % static_cast<int>(retourWidth),
+                retourCadre.getPosition().y + retourHeight
+            );
+            hoverParticle.setFillColor(sf::Color(0, 255, 255, 100));
+            window.draw(hoverParticle);
+        }
+
+        // Ligne d'énergie au survol
+        sf::RectangleShape energyLine(sf::Vector2f(retourWidth, 2.f));
+        energyLine.setPosition(retourCadre.getPosition().x, retourCadre.getPosition().y + retourHeight - 2);
+        energyLine.setFillColor(sf::Color(0, 255, 255, static_cast<sf::Uint8>(100 + 155 * pulseFactor)));
+        window.draw(energyLine);
+    }
+
+    // Petites flèches animées à côté du bouton retour
+    static float arrowOffset = 0.0f;
+    arrowOffset += 0.1f;
+    float arrowPulse = (std::sin(arrowOffset) + 1.0f) / 2.0f;
+
+    for (int i = 0; i < 2; i++) {
+        sf::ConvexShape arrow;
+        arrow.setPointCount(3);
+        arrow.setPoint(0, sf::Vector2f(0, 0));
+        arrow.setPoint(1, sf::Vector2f(15, 10));
+        arrow.setPoint(2, sf::Vector2f(0, 20));
+        arrow.setFillColor(sf::Color(0, 157, 255, static_cast<sf::Uint8>(100 + 155 * arrowPulse)));
+
+        float xPos = retourCadre.getPosition().x - 30.f - (i * 20.f) - (arrowPulse * 5.f);
+        arrow.setPosition(xPos, retourCadre.getPosition().y + 15);
+        window.draw(arrow);
     }
 
     window.draw(retourCadre);
     window.draw(retourTexte);
-
-    // Effet de scan-lines
-    for (int y = 0; y < window.getSize().y; y += 4) {
-        sf::RectangleShape scanLine(sf::Vector2f(window.getSize().x, 1));
-        scanLine.setPosition(0, y);
-        scanLine.setFillColor(sf::Color(255, 255, 255, 3));
-        window.draw(scanLine);
-    }
-
     window.display();
 }
 
